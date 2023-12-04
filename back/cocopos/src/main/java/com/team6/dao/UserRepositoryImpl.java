@@ -1,6 +1,6 @@
-package com.team6.cocopos.dao;
+package com.team6.dao;
 
-import com.team6.cocopos.entity.User;
+import com.team6.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.jdbc.core.JdbcTemplate;

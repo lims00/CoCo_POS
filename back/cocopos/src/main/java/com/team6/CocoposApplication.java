@@ -1,4 +1,4 @@
-package com.team6.cocopos;
+package com.team6;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

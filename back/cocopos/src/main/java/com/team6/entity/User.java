@@ -1,4 +1,4 @@
-package com.team6.cocopos.entity;
+package com.team6.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

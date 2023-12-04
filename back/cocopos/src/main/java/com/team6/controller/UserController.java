@@ -1,6 +1,6 @@
-package com.team6.cocopos.controller;
-import com.team6.cocopos.dao.UserRepository;
-import com.team6.cocopos.entity.User;
+package com.team6.controller;
+import com.team6.dao.UserRepository;
+import com.team6.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

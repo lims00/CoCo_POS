@@ -1,5 +1,5 @@
-package com.team6.cocopos.dao;
-import com.team6.cocopos.entity.User;
+package com.team6.dao;
+import com.team6.entity.User;
 import java.util.List;
 
 public interface UserRepository {
