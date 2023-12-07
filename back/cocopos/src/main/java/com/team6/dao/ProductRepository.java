@@ -11,9 +11,9 @@ public interface ProductRepository {
     Product updateProduct(Product product);
 
     /* ID로 상품 검색 */
-    Product getById(int ProductID);
+    Product getById(int productId);
     /* ID로 상품 삭제 */
-    String deleteById(int ProductID);
+    String deleteById(int productId);
 
     /* 모든 상품 불러오기 */
     List<Product> allProducts();
