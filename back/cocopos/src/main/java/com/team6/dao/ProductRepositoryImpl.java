@@ -10,16 +10,16 @@ import java.util.List;
 @Repository
 public class ProductRepositoryImpl implements ProductRepository {
     private static final String INSERT_PRODUCT_QUERY =
-            "INSERT INTO product(productID, name, description, price, discountedPrice";
+            "INSERT INTO product(ProductID, ProductName, Price, StockQuantity, CategoryID)";
 
     private static final String UPDATE_PRODUCT_BY_ID_QUERY =
-            "UPDATE product SET (name=?, description=?, price=?, discountedPrice=?) WHERE productId=?";
+            "UPDATE product SET (ProductName=?, Price=?) WHERE productId=?";
 
     private static final String GET_PRODUCT_BY_ID_QUERY =
-            "SELECT * FROM product WHERE productId=?";
+            "SELECT * FROM product WHERE ProductID=?";
 
     private static final String DELETE_PRODUCT_BY_ID =
-            "DELETE FROM product WHERE productID=?";
+            "DELETE FROM product WHERE ProductID=?";
 
     private static final String GET_PRODUCTS_QUERY =
             "SELECT * FROM product";
@@ -32,22 +32,21 @@ public class ProductRepositoryImpl implements ProductRepository {
     @Override
     public Product saveProduct(Product product) {
         jdbcTemplate.update(INSERT_PRODUCT_QUERY,
-                product.getProductId(),
-                product.getName(),
-                product.getDescription(),
+                product.getProductID(),
+                product.getProductName(),
                 product.getPrice(),
-                product.getDiscountedPrice());
+                product.getStockQuantity(),
+                product.getCategoryID());
         return product;
     }
 
     @Override
     public Product updateProduct(Product product) {
         jdbcTemplate.update(UPDATE_PRODUCT_BY_ID_QUERY,
-                product.getName(),
-                product.getDescription(),
+                product.getProductName(),
                 product.getPrice(),
-                product.getDiscountedPrice(),
-                product.getProductId());
+                product.getProductID()
+        );
         return product;
     }
 
@@ -57,12 +56,11 @@ public class ProductRepositoryImpl implements ProductRepository {
     public Product getById(int ProductID) {
         return jdbcTemplate.queryForObject(GET_PRODUCT_BY_ID_QUERY, (rs, rowNum) -> {
             return new Product(
-                    rs.getInt("productId"),
-                    rs.getString("name"),
-                    rs.getString("description"),
-                    rs.getInt("price"),
-                    rs.getInt("discountedPrice"),
-                    rs.getInt("stockQuantity"));
+                    rs.getInt("ProductId"),
+                    rs.getString("ProductName"),
+                    rs.getInt("Price"),
+                    rs.getInt("StockQuantity"),
+                    rs.getInt("CategoryID"));
         });
     }
 
@@ -77,15 +75,14 @@ public class ProductRepositoryImpl implements ProductRepository {
     ;
 
     @Override
-    public List<Product> AllProducts() {
+    public List<Product> allProducts() {
         return jdbcTemplate.query(GET_PRODUCTS_QUERY, (rs, rowNum) -> {
             return new Product(
-                    rs.getInt("productId"),
-                    rs.getString("name"),
-                    rs.getString("description"),
-                    rs.getInt("price"),
-                    rs.getInt("discountedPrice"),
-                    rs.getInt("stockQuantity"));
+                    rs.getInt("ProductId"),
+                    rs.getString("ProductName"),
+                    rs.getInt("Price"),
+                    rs.getInt("StockQuantity"),
+                    rs.getInt("CategoryID"));
         });
     }
 }

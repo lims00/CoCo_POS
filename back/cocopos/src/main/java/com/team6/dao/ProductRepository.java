@@ -11,10 +11,14 @@ public interface ProductRepository {
     Product updateProduct(Product product);
 
     /* ID로 상품 검색 */
-    Product getById(int productId);
+    Product getById(int ProductID);
     /* ID로 상품 삭제 */
-    String deleteById(int productId);
+    String deleteById(int ProductID);
 
     /* 모든 상품 불러오기 */
-    List<Product> AllProducts();
+    List<Product> allProducts();
 }
+
+
+
+

@@ -7,9 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class User {
-    private int id;
-    private String fname;
-    private String lname;
-    private String email;
+public class Category {
+    private int CategoryID;
+    private String CategoryName;
 }
