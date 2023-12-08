@@ -64,7 +64,6 @@ COLLATE = utf8mb4_0900_ai_ci;
 CREATE TABLE IF NOT EXISTS `pos_db`.`membershiplevel` (
   `LevelID` INT NOT NULL,
   `LevelName` VARCHAR(50) NULL DEFAULT NULL,
-  `MinPoints` INT NULL DEFAULT NULL,
   `DiscountRate` DECIMAL(5,2) NULL DEFAULT NULL,
   PRIMARY KEY (`LevelID`))
 ENGINE = InnoDB

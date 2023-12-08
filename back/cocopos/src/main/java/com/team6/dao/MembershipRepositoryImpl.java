@@ -14,15 +14,15 @@ public class MembershipRepositoryImpl implements MembershipRepository {
     JdbcTemplate jdbcTemplate;
 
     private static final String INSERT_MEMBERSHIP_QUERY =
-            "INSERT INTO membership (MembershipLevelID, CustomerID, JoinDate, ExpiryDate, Status VALUES (?, ?, ?, ?, ?)";
+            "INSERT INTO membership (LevelID, CustomerID, JoinDate, ExpiryDate, Status) VALUES (?, ?, ?, ?, ?)";
 
     @Override
     public Membership createMembership(Membership membership) {
         jdbcTemplate.update(INSERT_MEMBERSHIP_QUERY,
                 membership.getLevelId(),
                 membership.getCustomerId(),
-                membership.getJoinDate().replace("-", ""),
-                membership.getExpiryDate().replace("-", ""),
+                membership.getJoinDate(),
+                membership.getExpiryDate(),
                 membership.getStatus());
         return membership;
     }
