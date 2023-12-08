@@ -28,6 +28,12 @@ public class ProductController {
         return productRepository.getById(id);
     }
 
+    @DeleteMapping("/product/{id}")
+    public String deleteCategory(@PathVariable("id") int id) {
+        return productRepository.deleteById(id);
+    }
+
+
     @GetMapping("/products")
     public List<Product> getProducts() {
         return productRepository.allProducts();

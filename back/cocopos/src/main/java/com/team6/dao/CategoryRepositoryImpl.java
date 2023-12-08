@@ -14,7 +14,7 @@ public class CategoryRepositoryImpl implements CategoryRepository {
     private JdbcTemplate jdbcTemplate;
 
     private static final String INSERT_CATEGORY_QUERY =
-            "INSERT INTO category (categoryId, categoryName)";
+            "INSERT INTO category (categoryId, categoryName) VALUES(?, ?)";
 
     private static final String UPDATE_CATEGORY_BY_ID_QUERY =
             "UPDATE category SET (category Name=?) WHERE categoryId=?";
