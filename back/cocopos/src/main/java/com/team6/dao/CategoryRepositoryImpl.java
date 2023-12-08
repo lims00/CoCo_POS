@@ -17,10 +17,10 @@ public class CategoryRepositoryImpl implements CategoryRepository {
             "INSERT INTO category (categoryId, categoryName) VALUES(?, ?)";
 
     private static final String UPDATE_CATEGORY_BY_ID_QUERY =
-            "UPDATE category SET (category Name=?) WHERE categoryId=?";
+            "UPDATE category SET (CategoryName=?) WHERE CategoryId=?";
 
     private static final String GET_CATEGORY_BY_ID_QUERY =
-            "SELECT * FROM category WHERE categoryId=?";
+            "SELECT * FROM category WHERE CategoryID=?";
 
     private static final String GET_CATEGORY_BY_NAME_QUERY =
             "SELECT * FROM category WHERE categoryName=?";
@@ -32,7 +32,7 @@ public class CategoryRepositoryImpl implements CategoryRepository {
             "SELECT * FROM category";
 
     @Override
-    public Category saveCategory(Category category) {
+    public Category createCategory(Category category) {
         jdbcTemplate.update(INSERT_CATEGORY_QUERY,
                 category.getCategoryId(),
                 category.getCategoryName());
@@ -55,7 +55,7 @@ public class CategoryRepositoryImpl implements CategoryRepository {
                     rs.getInt("CategoryID"),
                     rs.getString("CategoryName")
             );
-        });
+        },categoryName);
     }
 
     @Override

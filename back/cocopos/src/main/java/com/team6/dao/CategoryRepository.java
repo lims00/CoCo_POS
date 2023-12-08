@@ -10,7 +10,7 @@ Category Class:
  */
 
 public interface CategoryRepository {
-    Category saveCategory(Category category);
+    Category createCategory(Category category);
 
     Category UpdateCategory(Category category);
 

@@ -13,7 +13,8 @@ SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,N
 -- -----------------------------------------------------
 -- Schema pos_db
 -- -----------------------------------------------------
-CREATE SCHEMA IF NOT EXISTS `pos_db` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci ;
+DROP DATABASE IF EXISTS`pos_db`;
+CREATE SCHEMA `pos_db` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci ;
 USE `pos_db` ;
 
 -- -----------------------------------------------------
@@ -66,28 +67,6 @@ CREATE TABLE IF NOT EXISTS `pos_db`.`membershiplevel` (
   `MinPoints` INT NULL DEFAULT NULL,
   `DiscountRate` DECIMAL(5,2) NULL DEFAULT NULL,
   PRIMARY KEY (`LevelID`))
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8mb4
-COLLATE = utf8mb4_0900_ai_ci;
-
-
--- -----------------------------------------------------
--- Table `pos_db`.`customermembershiplevel`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `pos_db`.`customermembershiplevel` (
-  `CustomerMembershipLevelID` INT NOT NULL,
-  `CustomerID` INT NULL DEFAULT NULL,
-  `LevelID` INT NULL DEFAULT NULL,
-  `AchievedDate` DATE NULL DEFAULT NULL,
-  PRIMARY KEY (`CustomerMembershipLevelID`),
-  INDEX `CustomerID` (`CustomerID` ASC) VISIBLE,
-  INDEX `LevelID` (`LevelID` ASC) VISIBLE,
-  CONSTRAINT `customermembershiplevel_ibfk_1`
-    FOREIGN KEY (`CustomerID`)
-    REFERENCES `pos_db`.`customer` (`CustomerID`),
-  CONSTRAINT `customermembershiplevel_ibfk_2`
-    FOREIGN KEY (`LevelID`)
-    REFERENCES `pos_db`.`membershiplevel` (`LevelID`))
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_0900_ai_ci;
@@ -244,52 +223,23 @@ COLLATE = utf8mb4_0900_ai_ci;
 -- Table `pos_db`.`membership`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `pos_db`.`membership` (
-  `MembershipID` INT NOT NULL,
-  `CustomerID` INT NULL DEFAULT NULL,
+  `LevelID` INT NOT NULL,
+  `CustomerID` INT NOT NULL,
   `JoinDate` DATE NULL DEFAULT NULL,
   `ExpiryDate` DATE NULL DEFAULT NULL,
   `Status` VARCHAR(50) NULL DEFAULT NULL,
-  PRIMARY KEY (`MembershipID`),
+  PRIMARY KEY (`LevelID`, `CustomerID`),
   INDEX `CustomerID` (`CustomerID` ASC) VISIBLE,
   CONSTRAINT `membership_ibfk_1`
     FOREIGN KEY (`CustomerID`)
-    REFERENCES `pos_db`.`customer` (`CustomerID`))
+    REFERENCES `pos_db`.`customer` (`CustomerID`),
+  CONSTRAINT `membership_ibfk_2`
+    FOREIGN KEY (`LevelID`)
+    REFERENCES `pos_db`.`membershiplevel` (`LevelID`))
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_0900_ai_ci;
 
-
--- -----------------------------------------------------
--- Table `pos_db`.`membershipbenefits`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `pos_db`.`membershipbenefits` (
-  `MembershipBenefitsID` INT NOT NULL,
-  `MembershipID` INT NULL DEFAULT NULL,
-  `BenefitID` INT NULL DEFAULT NULL,
-  `MembershipLevelID` INT NULL DEFAULT NULL,
-  `ProductID` INT NULL DEFAULT NULL,
-  `DiscountAmount` DECIMAL(10,2) NULL DEFAULT NULL,
-  `EventType` VARCHAR(50) NULL DEFAULT NULL,
-  PRIMARY KEY (`MembershipBenefitsID`),
-  INDEX `MembershipID` (`MembershipID` ASC) VISIBLE,
-  INDEX `BenefitID` (`BenefitID` ASC) VISIBLE,
-  INDEX `MembershipLevelID` (`MembershipLevelID` ASC) VISIBLE,
-  INDEX `ProductID` (`ProductID` ASC) VISIBLE,
-  CONSTRAINT `membershipbenefits_ibfk_1`
-    FOREIGN KEY (`MembershipID`)
-    REFERENCES `pos_db`.`membership` (`MembershipID`),
-  CONSTRAINT `membershipbenefits_ibfk_2`
-    FOREIGN KEY (`BenefitID`)
-    REFERENCES `pos_db`.`benefit` (`BenefitID`),
-  CONSTRAINT `membershipbenefits_ibfk_3`
-    FOREIGN KEY (`MembershipLevelID`)
-    REFERENCES `pos_db`.`membershiplevel` (`LevelID`),
-  CONSTRAINT `membershipbenefits_ibfk_4`
-    FOREIGN KEY (`ProductID`)
-    REFERENCES `pos_db`.`product` (`ProductID`))
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8mb4
-COLLATE = utf8mb4_0900_ai_ci;
 
 
 -- -----------------------------------------------------
@@ -327,59 +277,6 @@ ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_0900_ai_ci;
 
-
--- -----------------------------------------------------
--- Table `pos_db`.`pointdashboard`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `pos_db`.`pointdashboard` (
-  `DashboardID` INT NOT NULL,
-  `MembershipID` INT NULL DEFAULT NULL,
-  `TotalPoints` INT NULL DEFAULT NULL,
-  `PointExpiryDate` DATE NULL DEFAULT NULL,
-  PRIMARY KEY (`DashboardID`),
-  INDEX `MembershipID` (`MembershipID` ASC) VISIBLE,
-  CONSTRAINT `pointdashboard_ibfk_1`
-    FOREIGN KEY (`MembershipID`)
-    REFERENCES `pos_db`.`membership` (`MembershipID`))
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8mb4
-COLLATE = utf8mb4_0900_ai_ci;
-
-
--- -----------------------------------------------------
--- Table `pos_db`.`pointexpiration`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `pos_db`.`pointexpiration` (
-  `PointExpirationID` INT NOT NULL,
-  `MembershipID` INT NULL DEFAULT NULL,
-  `ExpirationDate` DATE NULL DEFAULT NULL,
-  PRIMARY KEY (`PointExpirationID`),
-  INDEX `MembershipID` (`MembershipID` ASC) VISIBLE,
-  CONSTRAINT `pointexpiration_ibfk_1`
-    FOREIGN KEY (`MembershipID`)
-    REFERENCES `pos_db`.`membership` (`MembershipID`))
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8mb4
-COLLATE = utf8mb4_0900_ai_ci;
-
-
--- -----------------------------------------------------
--- Table `pos_db`.`pointtransaction`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `pos_db`.`pointtransaction` (
-  `TransactionID` INT NOT NULL,
-  `MembershipID` INT NULL DEFAULT NULL,
-  `TransactionDate` DATE NULL DEFAULT NULL,
-  `Amount` DECIMAL(10,2) NULL DEFAULT NULL,
-  `Type` VARCHAR(50) NULL DEFAULT NULL,
-  PRIMARY KEY (`TransactionID`),
-  INDEX `MembershipID` (`MembershipID` ASC) VISIBLE,
-  CONSTRAINT `pointtransaction_ibfk_1`
-    FOREIGN KEY (`MembershipID`)
-    REFERENCES `pos_db`.`membership` (`MembershipID`))
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8mb4
-COLLATE = utf8mb4_0900_ai_ci;
 
 
 -- -----------------------------------------------------

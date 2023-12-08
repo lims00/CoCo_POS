@@ -10,16 +10,16 @@ import java.util.List;
 @Repository
 public class ProductRepositoryImpl implements ProductRepository {
     private static final String INSERT_PRODUCT_QUERY =
-            "INSERT INTO product(productId, productName, price, stockQuantity, categoryId) VALUES(?, ?, ?, ?, ?)";
+            "INSERT INTO product(ProductId, ProductName, Price, StockQuantity, CategoryId) VALUES(?, ?, ?, ?, ?)";
 
     private static final String UPDATE_PRODUCT_BY_ID_QUERY =
-            "UPDATE product SET (productName=?, price=?) WHERE productId=?";
+            "UPDATE product SET (ProductName=?, Price=?) WHERE ProductID=?";
 
     private static final String GET_PRODUCT_BY_ID_QUERY =
-            "SELECT * FROM product WHERE productId=?";
+            "SELECT * FROM product WHERE ProductID=?";
 
     private static final String DELETE_PRODUCT_BY_ID =
-            "DELETE FROM product WHERE productId=?";
+            "DELETE FROM product WHERE ProductID=?";
 
     private static final String GET_PRODUCTS_QUERY =
             "SELECT * FROM product";
@@ -30,7 +30,7 @@ public class ProductRepositoryImpl implements ProductRepository {
 
     /* 유효성 검사 추가 예정 */
     @Override
-    public Product saveProduct(Product product) {
+    public Product createProduct(Product product) {
         jdbcTemplate.update(INSERT_PRODUCT_QUERY,
                 product.getProductId(),
                 product.getProductName(),
@@ -61,7 +61,7 @@ public class ProductRepositoryImpl implements ProductRepository {
                     rs.getInt("Price"),
                     rs.getInt("StockQuantity"),
                     rs.getInt("CategoryID"));
-        });
+        }, ProductID);
     }
 
     ;

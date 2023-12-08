@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface ProductRepository {
     /* 상품 생성 후 DB에 저장*/
-    Product saveProduct(Product product);
+    Product createProduct(Product product);
     /* 상품 정보 수정 후 DB에 저장 */
     Product updateProduct(Product product);
 

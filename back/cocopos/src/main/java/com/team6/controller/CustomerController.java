@@ -17,6 +17,16 @@ public class CustomerController {
 
     @PostMapping("/customer")
     public Customer addCustomer(@RequestBody Customer customer) {
-        return customerRepository.saveCustomer(customer);
+        return customerRepository.createCustomer(customer);
+    }
+
+    @GetMapping("/customer/{id}")
+    public Customer getCustomer(@PathVariable int id) {
+        return customerRepository.getById(id);
+    }
+
+    @GetMapping("/customers")
+    public List<Customer> getCustomers() {
+        return customerRepository.allCustomers();
     }
 }

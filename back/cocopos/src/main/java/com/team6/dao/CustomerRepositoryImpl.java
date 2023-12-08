@@ -13,11 +13,19 @@ public class CustomerRepositoryImpl implements CustomerRepository {
     private static final String INSERT_CUSTOMER_QUERY =
             "INSERT INTO customer(CustomerID, FirstName, LastName, Email, PhoneNumber, Address) VALUES (?, ?, ?, ?, ?, ?)";
 
+    private static final String UPDATE_CUSTOMER_BY_ID_QUERY =
+            "UPDATE customer SET(FirstName=?, LastName=?, Email=?, PhoneNumber=?, Address=?) WHERE CustomerID=?";
+
+    private static final String GET_CUSTOMER_BY_ID_QUERY =
+            "SELECT * FROM customer WHERE CustomerID=?";
+
+    private static final String GET_ALL_CUSTOMERS_QUERY =
+            "SELECT * FROM customer";
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
     @Override
-    public Customer saveCustomer(Customer customer) {
+    public Customer createCustomer(Customer customer) {
         jdbcTemplate.update(INSERT_CUSTOMER_QUERY,
                 customer.getCustomerId(),
                 customer.getFirstName(),
@@ -30,12 +38,28 @@ public class CustomerRepositoryImpl implements CustomerRepository {
 
     @Override
     public Customer updateCustomer(Customer customer) {
-        return null;
+        jdbcTemplate.update(UPDATE_CUSTOMER_BY_ID_QUERY,
+                customer.getFirstName(),
+                customer.getLastName(),
+                customer.getEmail(),
+                customer.getPhoneNumber(),
+                customer.getAddress(),
+                customer.getCustomerId());
+        return customer;
     }
 
     @Override
     public Customer getById(int customerId) {
-        return null;
+        return jdbcTemplate.queryForObject(GET_CUSTOMER_BY_ID_QUERY, (rs,rowNum) -> {
+            return new Customer(
+                    rs.getInt("CustomerID"),
+                    rs.getString("FirstName"),
+                    rs.getString("LastName"),
+                    rs.getString("Email"),
+                    rs.getString("PhoneNumber"),
+                    rs.getString("Address")
+            );
+        }, customerId);
     }
 
     @Override
@@ -45,6 +69,16 @@ public class CustomerRepositoryImpl implements CustomerRepository {
 
     @Override
     public List<Customer> allCustomers() {
-        return null;
+        return jdbcTemplate.query(GET_ALL_CUSTOMERS_QUERY, (rs, rowNum) -> {
+            return new Customer(
+                    rs.getInt("CustomerID"),
+                    rs.getString("FirstName"),
+                    rs.getString("LastName"),
+                    rs.getString("Email"),
+                    rs.getString("PhoneNumber"),
+                    rs.getString("Address"));
+        });
     }
 }
+
+
