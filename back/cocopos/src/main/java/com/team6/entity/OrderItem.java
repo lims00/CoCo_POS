@@ -10,10 +10,11 @@ import java.sql.Date;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Order {
+public class OrderItem {
+    private int orderItemId;
     private int orderId;
-    private int customerId;
-    private int paymentMethodId;
-    private String orderDate;
-    private int totalAmount;
+    private int productId;
+    private int quantity;
+    private int unitPrice;
+    private int subtotal;
 }

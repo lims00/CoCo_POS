@@ -1,19 +1,14 @@
 package com.team6.entity;
-
+import lombok.AllArgsConstructor;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.sql.Date;
-
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Order {
-    private int orderId;
+public class CustomerCoupon {
     private int customerId;
-    private int paymentMethodId;
-    private String orderDate;
-    private int totalAmount;
+    private int couponId;
+    private boolean isUsed; // Not used:0, used:1
 }
