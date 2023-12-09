@@ -3,6 +3,7 @@ SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
 
+-- 12/10 1:45
 -- -----------------------------------------------------
 -- Schema mydb
 -- -----------------------------------------------------
@@ -16,19 +17,6 @@ SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,N
 DROP DATABASE IF EXISTS`pos_db`;
 CREATE SCHEMA `pos_db` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci ;
 USE `pos_db` ;
-
--- -----------------------------------------------------
--- Table `pos_db`.`benefit`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `pos_db`.`benefit` (
-  `BenefitID` INT NOT NULL,
-  `BenefitName` VARCHAR(50) NULL DEFAULT NULL,
-  `Description` TEXT NULL DEFAULT NULL,
-  PRIMARY KEY (`BenefitID`))
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8mb4
-COLLATE = utf8mb4_0900_ai_ci;
-
 
 -- -----------------------------------------------------
 -- Table `pos_db`.`category`
@@ -57,6 +45,23 @@ ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_0900_ai_ci;
 
+CREATE TABLE IF NOT EXISTS `pos_db`.`customercoupon` (
+    `CustomerID` INT NOT NULL,
+    `CouponID` INT NOT NULL,
+    `IsUsed` INT NOT NULL,
+    PRIMARY KEY (`CustomerID`, `CouponID`),
+    CONSTRAINT `customercoupon_ibfk_1`
+        FOREIGN KEY (`CustomerID`)
+        REFERENCES `pos_db`.`customer` (`CustomerID`),
+    CONSTRAINT `customercoupon_ibfk_2`
+        FOREIGN KEY (`CouponID`)
+        REFERENCES `pos_db`.`coupon` (`CouponID`));
+
+
+CREATE TABLE IF NOT EXISTS `pos_db`.`coupon` (
+    `CouponID` INT NOT NULL,
+    `DiscountRate` INT NOT NULL,
+    PRIMARY KEY (`CouponID`));
 
 -- -----------------------------------------------------
 -- Table `pos_db`.`membershiplevel`
@@ -112,32 +117,7 @@ COLLATE = utf8mb4_0900_ai_ci;
 -- -----------------------------------------------------
 -- Table `pos_db`.`discount`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `pos_db`.`discount` (
-  `DiscountID` INT NOT NULL,
-  `DiscountType` VARCHAR(50) NULL DEFAULT NULL,
-  `DiscountAmount` DECIMAL(10,2) NULL DEFAULT NULL,
-  `DiscountStartDate` DATE NULL DEFAULT NULL,
-  `DiscountEndDate` DATE NULL DEFAULT NULL,
-  PRIMARY KEY (`DiscountID`))
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8mb4
-COLLATE = utf8mb4_0900_ai_ci;
 
-
--- -----------------------------------------------------
--- Table `pos_db`.`discountcoupon`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `pos_db`.`discountcoupon` (
-  `CouponID` INT NOT NULL,
-  `CouponCode` VARCHAR(50) NULL DEFAULT NULL,
-  `StartDate` DATETIME NULL DEFAULT NULL,
-  `EndDate` DATETIME NULL DEFAULT NULL,
-  `DiscountRate` DECIMAL(5,2) NULL DEFAULT NULL,
-  `CouponDescription` TEXT NULL DEFAULT NULL,
-  PRIMARY KEY (`CouponID`))
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8mb4
-COLLATE = utf8mb4_0900_ai_ci;
 
 
 -- -----------------------------------------------------
@@ -249,7 +229,6 @@ CREATE TABLE IF NOT EXISTS `pos_db`.`orderitem` (
   `OrderID` INT NULL DEFAULT NULL,
   `ProductID` INT NULL DEFAULT NULL,
   `Quantity` INT NULL DEFAULT NULL,
-  `UnitPrice` DECIMAL(10,2) NULL DEFAULT NULL,
   `Subtotal` DECIMAL(10,2) NULL DEFAULT NULL,
   PRIMARY KEY (`OrderItemID`),
   INDEX `OrderID` (`OrderID` ASC) VISIBLE,
@@ -279,25 +258,6 @@ COLLATE = utf8mb4_0900_ai_ci;
 
 
 -- -----------------------------------------------------
--- Table `pos_db`.`productdiscount`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `pos_db`.`productdiscount` (
-  `ProductID` INT NOT NULL,
-  `DiscountID` INT NOT NULL,
-  PRIMARY KEY (`ProductID`, `DiscountID`),
-  INDEX `DiscountID` (`DiscountID` ASC) VISIBLE,
-  CONSTRAINT `productdiscount_ibfk_1`
-    FOREIGN KEY (`ProductID`)
-    REFERENCES `pos_db`.`product` (`ProductID`),
-  CONSTRAINT `productdiscount_ibfk_2`
-    FOREIGN KEY (`DiscountID`)
-    REFERENCES `pos_db`.`discount` (`DiscountID`))
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8mb4
-COLLATE = utf8mb4_0900_ai_ci;
-
-
--- -----------------------------------------------------
 -- Table `pos_db`.`promotion`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `pos_db`.`promotion` (
@@ -312,26 +272,6 @@ ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_0900_ai_ci;
 
-
--- -----------------------------------------------------
--- Table `pos_db`.`productpromotionmapping`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `pos_db`.`productpromotionmapping` (
-  `MappingID` INT NOT NULL,
-  `ProductID` INT NULL DEFAULT NULL,
-  `PromotionID` INT NULL DEFAULT NULL,
-  PRIMARY KEY (`MappingID`),
-  INDEX `ProductID` (`ProductID` ASC) VISIBLE,
-  INDEX `PromotionID` (`PromotionID` ASC) VISIBLE,
-  CONSTRAINT `productpromotionmapping_ibfk_1`
-    FOREIGN KEY (`ProductID`)
-    REFERENCES `pos_db`.`product` (`ProductID`),
-  CONSTRAINT `productpromotionmapping_ibfk_2`
-    FOREIGN KEY (`PromotionID`)
-    REFERENCES `pos_db`.`promotion` (`PromotionID`))
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8mb4
-COLLATE = utf8mb4_0900_ai_ci;
 
 
 -- -----------------------------------------------------
@@ -446,24 +386,6 @@ COLLATE = utf8mb4_0900_ai_ci;
 -- -----------------------------------------------------
 -- Table `pos_db`.`relationshipentity`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `pos_db`.`relationshipentity` (
-  `MappingID` INT NOT NULL,
-  `CustomerID` INT NULL DEFAULT NULL,
-  `CouponID` INT NULL DEFAULT NULL,
-  `IsUsed` TINYINT(1) NULL DEFAULT NULL,
-  PRIMARY KEY (`MappingID`),
-  INDEX `CustomerID` (`CustomerID` ASC) VISIBLE,
-  INDEX `CouponID` (`CouponID` ASC) VISIBLE,
-  CONSTRAINT `relationshipentity_ibfk_1`
-    FOREIGN KEY (`CustomerID`)
-    REFERENCES `pos_db`.`customer` (`CustomerID`),
-  CONSTRAINT `relationshipentity_ibfk_2`
-    FOREIGN KEY (`CouponID`)
-    REFERENCES `pos_db`.`discountcoupon` (`CouponID`))
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8mb4
-COLLATE = utf8mb4_0900_ai_ci;
-
 
 -- -----------------------------------------------------
 -- Table `pos_db`.`report`
