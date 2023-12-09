@@ -72,9 +72,9 @@ COLLATE = utf8mb4_0900_ai_ci;
 
 
 -- -----------------------------------------------------
--- Table `pos_db`.`orders`
+-- Table `pos_db`.`order`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `pos_db`.`orders` (
+CREATE TABLE IF NOT EXISTS `pos_db`.`order` (
   `OrderID` INT NOT NULL,
   `CustomerID` INT NULL DEFAULT NULL,
   `OrderDate` DATE NULL DEFAULT NULL,
@@ -82,7 +82,7 @@ CREATE TABLE IF NOT EXISTS `pos_db`.`orders` (
   `PaymentMethod` VARCHAR(50) NULL DEFAULT NULL,
   PRIMARY KEY (`OrderID`),
   INDEX `CustomerID` (`CustomerID` ASC) VISIBLE,
-  CONSTRAINT `orders_ibfk_1`
+  CONSTRAINT `order_ibfk_1`
     FOREIGN KEY (`CustomerID`)
     REFERENCES `pos_db`.`customer` (`CustomerID`))
 ENGINE = InnoDB
@@ -103,7 +103,7 @@ CREATE TABLE IF NOT EXISTS `pos_db`.`customerpurchasehistory` (
     REFERENCES `pos_db`.`customer` (`CustomerID`),
   CONSTRAINT `customerpurchasehistory_ibfk_2`
     FOREIGN KEY (`OrderID`)
-    REFERENCES `pos_db`.`orders` (`OrderID`))
+    REFERENCES `pos_db`.`order` (`OrderID`))
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_0900_ai_ci;
@@ -256,7 +256,7 @@ CREATE TABLE IF NOT EXISTS `pos_db`.`orderitem` (
   INDEX `ProductID` (`ProductID` ASC) VISIBLE,
   CONSTRAINT `orderitem_ibfk_1`
     FOREIGN KEY (`OrderID`)
-    REFERENCES `pos_db`.`orders` (`OrderID`),
+    REFERENCES `pos_db`.`order` (`OrderID`),
   CONSTRAINT `orderitem_ibfk_2`
     FOREIGN KEY (`ProductID`)
     REFERENCES `pos_db`.`product` (`ProductID`))
@@ -342,12 +342,12 @@ CREATE TABLE IF NOT EXISTS `pos_db`.`sale` (
   `OrderID` INT NULL DEFAULT NULL,
   `SaleDate` DATE NULL DEFAULT NULL,
   `TotalAmount` DECIMAL(10,2) NULL DEFAULT NULL,
-  `PaymentMethod` VARCHAR(50) NULL DEFAULT NULL,
+  `PaymentMethodID` VARCHAR(50) NULL DEFAULT NULL,
   PRIMARY KEY (`SaleID`),
   INDEX `OrderID` (`OrderID` ASC) VISIBLE,
   CONSTRAINT `sale_ibfk_1`
     FOREIGN KEY (`OrderID`)
-    REFERENCES `pos_db`.`orders` (`OrderID`))
+    REFERENCES `pos_db`.`order` (`OrderID`))
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_0900_ai_ci;
@@ -518,7 +518,7 @@ CREATE TABLE IF NOT EXISTS `pos_db`.`returnexchange` (
   INDEX `CustomerID` (`CustomerID` ASC) VISIBLE,
   CONSTRAINT `returnexchange_ibfk_1`
     FOREIGN KEY (`OrderID`)
-    REFERENCES `pos_db`.`orders` (`OrderID`),
+    REFERENCES `pos_db`.`order` (`OrderID`),
   CONSTRAINT `returnexchange_ibfk_2`
     FOREIGN KEY (`CustomerID`)
     REFERENCES `pos_db`.`customer` (`CustomerID`))
