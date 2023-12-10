@@ -23,11 +23,11 @@ const Modal2 = styled.div`
   overflow-y: auto;
   background-color: white;
   align-items: center;
-  padding: 10px;
+  padding:10px;
 `
 const ModalContent = styled.div`
   margin: 40px;
-
+  
   width: 80%;
   display: flex;
   justify-content: center;
@@ -42,33 +42,40 @@ const ModalBtn = styled.button`
   height: 40px;
   width: 120px;
   padding: 3px;
-  margin-top: 70px;
+  margin-top:70px;
   font-size: 20px;
   margin-bottom: 20px;
 `
 
-const ModalInput = styled.input`
-  height: 40px;
-  margin-top: 30px;
+const ModalInput=styled.input`
+height: 40px;
+  margin-top:30px;
   font-size: 30px;
   width: 200px;
 `
-const AlertModal = ({isOpen, click, content}) => {
-
+const InputModal=({isOpen,click,setInput,content,moneyResult=click()})=>{
+    //이거 모달 닫을 때 보내는 input값? 처럼 쓸 예정인데 걍 필요없는듯,,
+    const [inputValue,setInputValue]=useState('')
     const CloseModal = () => {
-        click(false);
-
+        if (inputValue!==''){
+            click(false);
+            moneyResult(true);
+        }
+    }
+    const handleChange=(e)=>{
+        setInput(e.target.value)
+        setInputValue(e.target.value)
     }
 
-
-    return (
+    return(
         <div style={{'display': isOpen ? "block" : "none"}}>
             <Modal1/>
             <Modal2>
                 <ModalContent>{content}</ModalContent>
-                <ModalBtn onClick={CloseModal}>완료</ModalBtn>
+                <ModalInput onChange={handleChange}></ModalInput>
+                <ModalBtn onClick={CloseModal}>입력 완료</ModalBtn>
             </Modal2>
         </div>)
 }
 
-export default AlertModal;
+export default InputModal;

@@ -1,4 +1,5 @@
-import React, {useState} from "react";
+import React from "react";
+
 import styled from "styled-components";
 
 const Modal1 = styled.div`
@@ -23,11 +24,13 @@ const Modal2 = styled.div`
   overflow-y: auto;
   background-color: white;
   align-items: center;
-  padding: 10px;
+  padding:10px;
 `
 const ModalContent = styled.div`
-  margin: 40px;
-
+  display: flex;
+  flex-direction: row;
+  margin: 20px;
+  
   width: 80%;
   display: flex;
   justify-content: center;
@@ -42,33 +45,35 @@ const ModalBtn = styled.button`
   height: 40px;
   width: 120px;
   padding: 3px;
-  margin-top: 70px;
+  margin-top:70px;
   font-size: 20px;
   margin-bottom: 20px;
 `
 
-const ModalInput = styled.input`
-  height: 40px;
-  margin-top: 30px;
-  font-size: 30px;
-  width: 200px;
+
+
+const Tittle=styled.div`
+  display: flex;
+  justify-content: center;
+    margin-right: 20px;
+  width: 80px;
+
 `
-const AlertModal = ({isOpen, click, content}) => {
-
-    const CloseModal = () => {
+const MoneyModal=({isOpen,click,setInput,total,inputMoney})=>{
+    const returnMoney=inputMoney-total
+    const CloseModal=()=>{
         click(false);
-
     }
-
-
-    return (
+    return(
         <div style={{'display': isOpen ? "block" : "none"}}>
             <Modal1/>
             <Modal2>
-                <ModalContent>{content}</ModalContent>
-                <ModalBtn onClick={CloseModal}>완료</ModalBtn>
+                <ModalContent><Tittle>총 금액</Tittle>{total}</ModalContent>
+                <ModalContent><Tittle>받은 금액</Tittle>{inputMoney}</ModalContent>
+                <ModalContent><Tittle>거스름돈</Tittle>{returnMoney}</ModalContent>
+                <ModalBtn onClick={CloseModal}>입력 완료</ModalBtn>
             </Modal2>
         </div>)
 }
 
-export default AlertModal;
+export default MoneyModal;
