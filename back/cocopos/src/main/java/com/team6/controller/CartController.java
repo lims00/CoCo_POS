@@ -8,6 +8,8 @@ import com.team6.entity.Customer;
 import com.team6.entity.Membership;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 
 import java.util.List;
 
@@ -28,15 +30,30 @@ public class CartController {
     CustomerCouponRepository customerCouponRepository;
 
     @GetMapping("/customercart/{customerId}")
-    public String customerCart(@PathVariable int customerId) {
+    public JSONObject customerCart(@PathVariable int customerId) {
         Membership membership = membershipRepository.getByCustomerId(customerId);
         Customer customer = customerRepository.getById(customerId);
         List<CustomerCoupon> customercoupons = customerCouponRepository.getCouponsById(customerId);
 
+        JSONObject info = new JSONObject();
+        JSONArray coupons = new JSONArray();
         Gson gson = new Gson();
-        String json = gson.toJson(customer);
-        json = json + gson.toJson(membership) + gson.toJson(customercoupons);
-        return json;
+
+
+        info.put("customerName", customer.getFirstName() + ' ' + customer.getLastName());
+        info.put("customerId", customer.getCustomerId());
+        info.put("membershipLevel", membership.getLevelId());
+
+
+        System.out.println(customer.getFirstName() + ' ' + customer.getLastName());
+        System.out.println(membership.getLevelId());
+        for (int i=0 ; i < customercoupons.size() ; i++){
+            System.out.println(customercoupons.get(i));
+            coupons.add(gson.toJson(customercoupons.get(i)));
+        }
+        info.put("coupons", coupons);
+
+        return info;
     }
 
 }

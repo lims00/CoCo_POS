@@ -682,10 +682,8 @@ INSERT INTO customercoupon(customerid, couponid, isused) VALUES(4372, 3, 0);
 INSERT INTO customercoupon(customerid, couponid, isused) VALUES(4372, 4, 0);
 INSERT INTO customercoupon(customerid, couponid, isused) VALUES(4372, 5, 0);
 
-INSERT INTO membershiplevel(LevelID, LevelName, DiscountRate) VALUES(1, 'Bronze', 10);
-INSERT INTO membershiplevel(LevelID, LevelName, DiscountRate) VALUES(2, 'Silver', 15);
-INSERT INTO membershiplevel(LevelID, LevelName, DiscountRate) VALUES(3, 'Gold', 20);
-INSERT INTO membershiplevel(LevelID, LevelName, DiscountRate) VALUES(4, 'Platinum', 25);
-INSERT INTO membershiplevel(LevelID, LevelName, DiscountRate) VALUES(5, 'Diamond', 30);
+INSERT INTO membershiplevel(LevelID, LevelName, DiscountRate) VALUES(1, 'Bronze', 5);
+INSERT INTO membershiplevel(LevelID, LevelName, DiscountRate) VALUES(2, 'Silver', 10);
+INSERT INTO membershiplevel(LevelID, LevelName, DiscountRate) VALUES(3, 'Gold', 15);
 
 INSERT INTO membership(LevelID, CustomerID, JoinDate, ExpiryDate, Status) VALUES (3, 1907, 231210,241210, 'active');
