@@ -59,7 +59,7 @@ CREATE TABLE IF NOT EXISTS `pos_db`.`customercoupon` (
 
 CREATE TABLE IF NOT EXISTS `pos_db`.`coupon` (
     `CouponID` INT NOT NULL,
-    `DiscountRate` INT NOT NULL,
+    `DiscountPrice` INT NOT NULL,
     PRIMARY KEY (`CouponID`));
 
 -- -----------------------------------------------------
@@ -76,9 +76,9 @@ COLLATE = utf8mb4_0900_ai_ci;
 
 
 -- -----------------------------------------------------
--- Table `pos_db`.`order`
+-- Table `pos_db`.`orders`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `pos_db`.`order` (
+CREATE TABLE IF NOT EXISTS `pos_db`.`orders` (
   `OrderID` INT NOT NULL,
   `CustomerID` INT NULL DEFAULT NULL,
   `PaymentMethodID` INT NOT NULL,
@@ -98,19 +98,19 @@ COLLATE = utf8mb4_0900_ai_ci;
 
 
 -- -----------------------------------------------------
--- Table `pos_db`.`customerpurchasehistory`
+-- Table `pos_db`.`customerorderhistory`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `pos_db`.`customerpurchasehistory` (
+CREATE TABLE IF NOT EXISTS `pos_db`.`customerorderhistory` (
   `CustomerID` INT NOT NULL,
   `OrderID` INT NOT NULL,
   PRIMARY KEY (`CustomerID`, `OrderID`),
   INDEX `OrderID` (`OrderID` ASC) VISIBLE,
-  CONSTRAINT `customerpurchasehistory_ibfk_1`
+  CONSTRAINT `customerorderhistory_ibfk_1`
     FOREIGN KEY (`CustomerID`)
     REFERENCES `pos_db`.`customer` (`CustomerID`),
-  CONSTRAINT `customerpurchasehistory_ibfk_2`
+  CONSTRAINT `customerorderhistory_ibfk_2`
     FOREIGN KEY (`OrderID`)
-    REFERENCES `pos_db`.`order` (`OrderID`))
+    REFERENCES `pos_db`.`orders` (`OrderID`))
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_0900_ai_ci;
@@ -238,7 +238,7 @@ CREATE TABLE IF NOT EXISTS `pos_db`.`orderitem` (
   INDEX `ProductID` (`ProductID` ASC) VISIBLE,
   CONSTRAINT `orderitem_ibfk_1`
     FOREIGN KEY (`OrderID`)
-    REFERENCES `pos_db`.`order` (`OrderID`),
+    REFERENCES `pos_db`.`orders` (`OrderID`),
   CONSTRAINT `orderitem_ibfk_2`
     FOREIGN KEY (`ProductID`)
     REFERENCES `pos_db`.`product` (`ProductID`))
@@ -290,7 +290,7 @@ CREATE TABLE IF NOT EXISTS `pos_db`.`sale` (
   INDEX `OrderID` (`OrderID` ASC) VISIBLE,
   CONSTRAINT `sale_ibfk_1`
     FOREIGN KEY (`OrderID`)
-    REFERENCES `pos_db`.`order` (`OrderID`))
+    REFERENCES `pos_db`.`orders` (`OrderID`))
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_0900_ai_ci;
@@ -390,6 +390,36 @@ COLLATE = utf8mb4_0900_ai_ci;
 -- Table `pos_db`.`relationshipentity`
 -- -----------------------------------------------------
 
+CREATE TABLE IF NOT EXISTS `pos_db`.`cart` (
+    `CartID` INT NOT NULL AUTO_INCREMENT,
+    `CustomerID` INT NOT NULL,
+    `TotalPrice` INT,
+    PRIMARY KEY (`CartID`),
+    CONSTRAINT `cart_ibfk_1`
+      FOREIGN KEY (`CustomerID`)
+      REFERENCES `pos_db`.`customer` (`CustomerID`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_0900_ai_ci;
+
+CREATE TABLE IF NOT EXISTS `pos_db`.`cartitem` (
+    `CartID` INT NOT NULL,
+    `ProductID` INT NOT NULL,
+    `UnitPrice` INT,
+    `Quantity` INT,
+    PRIMARY KEY (`CartID`, `ProductID`),
+    CONSTRAINT `cartitem_ibfk_1`
+      FOREIGN KEY (`CartID`)
+      REFERENCES `pos_db`.`cart` (`CartID`),
+    CONSTRAINT `cartitem_ibfk_2`
+      FOREIGN KEY (`ProductID`)
+      REFERENCES `pos_db`.`product` (`ProductID`))
+
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_0900_ai_ci;
+
+
 -- -----------------------------------------------------
 -- Table `pos_db`.`report`
 -- -----------------------------------------------------
@@ -443,7 +473,7 @@ CREATE TABLE IF NOT EXISTS `pos_db`.`returnexchange` (
   INDEX `CustomerID` (`CustomerID` ASC) VISIBLE,
   CONSTRAINT `returnexchange_ibfk_1`
     FOREIGN KEY (`OrderID`)
-    REFERENCES `pos_db`.`order` (`OrderID`),
+    REFERENCES `pos_db`.`orders` (`OrderID`),
   CONSTRAINT `returnexchange_ibfk_2`
     FOREIGN KEY (`CustomerID`)
     REFERENCES `pos_db`.`customer` (`CustomerID`))
@@ -600,6 +630,62 @@ DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_0900_ai_ci;
 
 
+CREATE TABLE IF NOT EXISTS `pos_db`.`tax` (
+    `TaxID` INT NOT NULL,
+    `TaxName` VARCHAR(50) NOT NULL,
+    `TaxRate` Int NOT NULL,
+    PRIMARY KEY (`TaxID`));
+
+
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
+
+INSERT INTO customer(CustomerID, FirstName, LastName, Email, PhoneNumber, Address)
+VALUES (1907, 'MyeongHoon', 'jang', 'jmh@cau.co.kr', 01012345678, 'CAU');
+INSERT INTO customer(CustomerID, FirstName, LastName, Email, PhoneNumber, Address)
+VALUES(1973, 'JeongWon', 'Na', 'njw@cau.co.kr', 01012345678, 'CAU');
+INSERT INTO customer(CustomerID, FirstName, LastName, Email, PhoneNumber, Address)
+VALUES(0641, 'SuHyun', 'Lim', 'lsh@cau.co.kr', 01012345678, 'CAU');
+INSERT INTO customer(CustomerID, FirstName, LastName, Email, PhoneNumber, Address)
+VALUES(4372, 'SooMin', 'Bae', 'bsm@cau.ac.kr', 01012345678, 'CAU');
+#INSERT INTO customer(CustomerID, FirstName, LastName, Email, PhoneNumber, Address)
+#VALUES(1973, 'YoHan', 'shin', 'syh@cau.ac.r', 01012345678, 'CAU');
+
+INSERT INTO coupon(CouponID, DiscountPrice) VALUES(1, 1000);
+INSERT INTO coupon(CouponID, DiscountPrice) VALUES(2, 2000);
+INSERT INTO coupon(CouponID, DiscountPrice) VALUES(3, 3000);
+INSERT INTO coupon(CouponID, DiscountPrice) VALUES(4, 4000);
+INSERT INTO coupon(CouponID, DiscountPrice) VALUES(5, 5000);
+
+INSERT INTO customercoupon(customerid, couponid, isused) VALUES(1907, 1, 0);
+INSERT INTO customercoupon(customerid, couponid, isused) VALUES(1907, 2, 0);
+INSERT INTO customercoupon(customerid, couponid, isused) VALUES(1907, 3, 0);
+INSERT INTO customercoupon(customerid, couponid, isused) VALUES(1907, 4, 0);
+INSERT INTO customercoupon(customerid, couponid, isused) VALUES(1907, 5, 0);
+
+INSERT INTO customercoupon(customerid, couponid, isused) VALUES(1973, 1, 0);
+INSERT INTO customercoupon(customerid, couponid, isused) VALUES(1973, 2, 0);
+INSERT INTO customercoupon(customerid, couponid, isused) VALUES(1973, 3, 0);
+INSERT INTO customercoupon(customerid, couponid, isused) VALUES(1973, 4, 0);
+INSERT INTO customercoupon(customerid, couponid, isused) VALUES(1973, 5, 0);
+
+INSERT INTO customercoupon(customerid, couponid, isused) VALUES(0641, 1, 0);
+INSERT INTO customercoupon(customerid, couponid, isused) VALUES(0641, 2, 0);
+INSERT INTO customercoupon(customerid, couponid, isused) VALUES(0641, 3, 0);
+INSERT INTO customercoupon(customerid, couponid, isused) VALUES(0641, 4, 0);
+INSERT INTO customercoupon(customerid, couponid, isused) VALUES(0641, 5, 0);
+
+INSERT INTO customercoupon(customerid, couponid, isused) VALUES(4372, 1, 0);
+INSERT INTO customercoupon(customerid, couponid, isused) VALUES(4372, 2, 0);
+INSERT INTO customercoupon(customerid, couponid, isused) VALUES(4372, 3, 0);
+INSERT INTO customercoupon(customerid, couponid, isused) VALUES(4372, 4, 0);
+INSERT INTO customercoupon(customerid, couponid, isused) VALUES(4372, 5, 0);
+
+INSERT INTO membershiplevel(LevelID, LevelName, DiscountRate) VALUES(1, 'Bronze', 10);
+INSERT INTO membershiplevel(LevelID, LevelName, DiscountRate) VALUES(2, 'Silver', 15);
+INSERT INTO membershiplevel(LevelID, LevelName, DiscountRate) VALUES(3, 'Gold', 20);
+INSERT INTO membershiplevel(LevelID, LevelName, DiscountRate) VALUES(4, 'Platinum', 25);
+INSERT INTO membershiplevel(LevelID, LevelName, DiscountRate) VALUES(5, 'Diamond', 30);
+
+INSERT INTO membership(LevelID, CustomerID, JoinDate, ExpiryDate, Status) VALUES (3, 1907, 231210,241210, 'active');
