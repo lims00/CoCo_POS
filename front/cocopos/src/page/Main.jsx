@@ -1,12 +1,14 @@
-import React from 'react';
+import React, {useState} from 'react';
 import styled from "styled-components";
 
 import {Link} from "react-router-dom";
+import Sale from "./Sale";
 
 
 const SaleBtn = styled.button`
-  width: 500px;
-  height: 500px;
+  width: 400px;
+  height: 50px;
+  margin-top: 30px;
   border-radius: 10px;
   border: 1px solid grey;
   background-color: white;
@@ -17,10 +19,19 @@ const SaleLink = styled(Link)`
   text-decoration: none;
   text-line-through-color: black;
 `
+const IdInput = styled.div`
+  display: flex;
+
+`
 const SaleWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
   width: 500px;
-  height: 500px;
-  font-size: 50px;
+  height: 400px;
+  font-size: 25px;
   text-decoration: none;
   border-radius: 10px;
   border: 1px solid grey;
@@ -41,9 +52,9 @@ const SmallBtn = styled.div`
   height: 100px;
   border-radius: 10px;
   border: 1px solid grey;
-  margin-left:30px;
-  margin-top:20px;
-  
+  margin-left: 30px;
+  margin-top: 20px;
+
 `
 
 const SmallBtnWrapper = styled.div`
@@ -51,15 +62,24 @@ const SmallBtnWrapper = styled.div`
   flex-direction: column;
 `
 const Main = () => {
+    const [searchValue, setSearchValue] = useState('');
+    const handleChange = (e) => {
+        setSearchValue(e.target.value)
+        console.log(searchValue)
+    }
+    const handleSearch = () => {
+
+    }
+
     return (
         <Wrapper>
-            <SaleBtn>
-                <SaleLink to='/sale'>상품</SaleLink>
-            </SaleBtn>
+            <SaleWrapper>
+                <SaleLink to='/item'>상품 구매</SaleLink>
+            </SaleWrapper>
             <SmallBtnWrapper>
                 <SmallBtn><SaleLink to='/sale'>거래내역</SaleLink></SmallBtn>
                 <SmallBtn><SaleLink to='/return'>반품 및 교환</SaleLink></SmallBtn>
-                <SmallBtn><SaleLink to='/itemmanage'>재고관리</SaleLink></SmallBtn>
+                <SmallBtn><SaleLink to='/manage'>재고관리</SaleLink></SmallBtn>
             </SmallBtnWrapper>
         </Wrapper>
 
