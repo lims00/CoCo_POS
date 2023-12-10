@@ -1,3 +1,5 @@
+-- -- 할인 적용 함수
+
 DELIMITER //
 CREATE FUNCTION ApplyDiscount(customer_id INT, purchase_amount DECIMAL(10,2)) RETURNS DECIMAL(10,2) READS SQL DATA
 BEGIN
@@ -12,3 +14,5 @@ BEGIN
     RETURN purchase_amount;
 END //
 DELIMITER ;
+
+-- 예시 SELECT ApplyDiscount(123, 100.00) AS FinalPurchaseAmount;

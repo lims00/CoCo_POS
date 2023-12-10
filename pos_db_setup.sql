@@ -688,3 +688,6 @@ INSERT INTO `pos_db`.`membershiplevel` (`LevelID`, `LevelName`, `DiscountRate`) 
 (1, 'Bronze', 5.00),
 (2, 'Silver', 10.00),
 (3, 'Gold', 15.00);
+
+INSERT INTO pos_db.tax (TaxID, TaxName, TaxRate) VALUES
+(1, '부가가치세', 10);
