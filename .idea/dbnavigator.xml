@@ -58,6 +58,7 @@ DELIMITER ;]]></console>
   <component name="DBNavigator.Project.DatabaseFileManager">
     <open-files>
       <object connection-id="e7dd7710-5f9e-49f3-a561-099ae24c71e7" object-ref="schemas/pos_db/tables/tax" />
+      <object connection-id="e7dd7710-5f9e-49f3-a561-099ae24c71e7" object-ref="schemas/pos_db/tables/customerorderhistory" />
     </open-files>
   </component>
   <component name="DBNavigator.Project.DatasetFilterManager">
@@ -66,6 +67,7 @@ DELIMITER ;]]></console>
     <filter-actions connection-id="e7dd7710-5f9e-49f3-a561-099ae24c71e7" dataset="pos_db.cart" active-filter-id="" />
     <filter-actions connection-id="e7dd7710-5f9e-49f3-a561-099ae24c71e7" dataset="pos_db.tax" active-filter-id="" />
     <filter-actions connection-id="e7dd7710-5f9e-49f3-a561-099ae24c71e7" dataset="pos_db.order" active-filter-id="" />
+    <filter-actions connection-id="e7dd7710-5f9e-49f3-a561-099ae24c71e7" dataset="pos_db.customerorderhistory" active-filter-id="" />
     <filter-actions connection-id="e7dd7710-5f9e-49f3-a561-099ae24c71e7" dataset="pos_db.membership" active-filter-id="" />
   </component>
   <component name="DBNavigator.Project.ExecutionManager">
