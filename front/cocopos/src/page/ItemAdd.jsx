@@ -1,11 +1,13 @@
 import styled from "styled-components";
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import Sale from "./Sale";
-import AlertModal from "../components/AlertModal";
+import InputModal from "../components/InputModal";
 import CustomerInfoBox from "../components/CustomerInfoBox";
 import TableForm from "../components/TableForm";
 import Price from "../components/Price";
 import {Link} from "react-router-dom";
+import AlertModal from "../components/AlertModal";
+import MoneyModal from "../components/MoneyModal";
 
 const Wrapper = styled.div`
   margin-top: 70px;
@@ -82,11 +84,11 @@ const PaymentBtn = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 100px;
+  width: 120px;
   height: 100px;
   border-radius: 10px;
   border: 1px solid grey;
-  margin-left: 30px;
+  margin-left: 10px;
   margin-top: 20px;
 
 `
@@ -96,6 +98,12 @@ const ItemAdd = () => {
     const [customerId, setCustomerId] = useState('');
     const [searchCnt, setSearchCnt] = useState('');
     const [modalOpen, setModalOpen] = useState(true);
+    const [couponId,setCoupon]=useState('');
+    const [cardPayOpen,setCardPayOpen]=useState(false);
+    const [moneyPayOpen, setMoneyPayOpen]=useState(false);
+    const [moneyPayResultOpen,setMoneyPayResultOpen]=useState(false);
+    const [moneyInput,setMoneyInput]=useState('');
+
     const handleItem = (e) => {
         setSearchItem(e.target.value)
         console.log(searchItem)
@@ -107,6 +115,16 @@ const ItemAdd = () => {
     const handleAdd = () => {
 
     }
+
+    const handleCardPay=()=>{
+        setCardPayOpen(true);
+
+    }
+
+    const handleMoneyPay=()=>{
+        setMoneyPayOpen(true);
+    }
+
 
 
     const headers =
@@ -149,7 +167,7 @@ const ItemAdd = () => {
     ]
     return (
         <Wrapper>
-            <AlertModal isOpen={modalOpen} content={"회원 번호를 입력하세요."} setInput={setCustomerId} click={setModalOpen}/>
+            <InputModal isOpen={modalOpen} content={"회원 번호를 입력하세요."} setInput={setCustomerId} click={setModalOpen}/>
             <ItemWrapper>
                 <p style={{display: 'flex', flexDirection: 'column'}}>
                     <IdInput>
@@ -184,7 +202,7 @@ const ItemAdd = () => {
                     <TableForm header={headers} items={items} headerKey={headerKey}/>
                     <CustomerInfoWrapper>
                         <CustomerInfoBox title={"회원 아이디"} content={customerId}/>
-                        <CustomerInfoBox title={"할인 쿠폰"} content={customerId}/>
+                        <CustomerInfoBox title={"할인 쿠폰"} content={couponId} handleChange={setCoupon} inputBox={true} />
                         <CustomerInfoBox title={"멤버십"} content={customerId}/>
                     </CustomerInfoWrapper></p>
 
@@ -198,9 +216,12 @@ const ItemAdd = () => {
                         <Price subject={'총 가격'} num={1000}/>
                     </PriceWrapper>
                     <PaymentWrapper>
-                        < PaymentBtn><PaymentLink to='/sale'>카드 결제</PaymentLink></PaymentBtn>
-                        < PaymentBtn><PaymentLink to='/sale'>현금 결제</PaymentLink></PaymentBtn>
+                        <PaymentBtn onClick={handleCardPay}>카드 결제</PaymentBtn>
+                        < PaymentBtn onClick={handleMoneyPay}>현금 결제</PaymentBtn>
                     </PaymentWrapper>
+                    <AlertModal isOpen={cardPayOpen} content={"카드를 삽입해 주세요."} click={setCardPayOpen}/>
+                    <InputModal isOpen={moneyPayOpen} content={"받은 금액을 입력해주세요."} click={setMoneyPayOpen} setInput={setMoneyInput} moneyResult={setMoneyPayResultOpen}/>
+                    <MoneyModal isOpen={moneyPayResultOpen} click={setMoneyPayResultOpen} total={1500} inputMoney={moneyInput} ></MoneyModal>
                 </p>
 
             </ItemWrapper>
