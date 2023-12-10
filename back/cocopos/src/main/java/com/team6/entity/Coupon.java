@@ -9,5 +9,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class Coupon {
     private int couponId;
-    private int discountRate;
+    private int discountPrice;
 }

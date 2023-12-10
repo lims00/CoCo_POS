@@ -2,8 +2,6 @@ package com.team6.controller;
 
 import com.google.gson.Gson;
 import com.team6.dao.*;
-import com.team6.entity.Cart;
-import com.team6.entity.CustomerCoupon;
 import com.team6.entity.Customer;
 import com.team6.entity.Membership;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,16 +25,14 @@ public class CartController {
     MembershipRepository membershipRepository;
 
     @Autowired
-    CustomerCouponRepository customerCouponRepository;
+    CouponRepository couponRepository;
 
     @GetMapping("/customercart/{customerId}")
     public JSONObject customerCart(@PathVariable int customerId) {
         Membership membership = membershipRepository.getByCustomerId(customerId);
         Customer customer = customerRepository.getById(customerId);
-        List<CustomerCoupon> customercoupons = customerCouponRepository.getCouponsById(customerId);
 
         JSONObject info = new JSONObject();
-        JSONArray coupons = new JSONArray();
         Gson gson = new Gson();
 
 
@@ -47,13 +43,9 @@ public class CartController {
 
         System.out.println(customer.getFirstName() + ' ' + customer.getLastName());
         System.out.println(membership.getLevelId());
-        for (int i=0 ; i < customercoupons.size() ; i++){
-            System.out.println(customercoupons.get(i));
-            coupons.add(gson.toJson(customercoupons.get(i)));
-        }
-        info.put("coupons", coupons);
 
         return info;
     }
+
 
 }

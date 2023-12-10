@@ -1,4 +1,3 @@
--- MySQL Workbench Forward Engineering
 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
@@ -43,19 +42,6 @@ CREATE TABLE IF NOT EXISTS `pos_db`.`customer` (
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_0900_ai_ci;
-
-CREATE TABLE IF NOT EXISTS `pos_db`.`customercoupon` (
-    `CustomerID` INT NOT NULL,
-    `CouponID` INT NOT NULL,
-    `IsUsed` INT NOT NULL,
-    PRIMARY KEY (`CustomerID`, `CouponID`),
-    CONSTRAINT `customercoupon_ibfk_1`
-        FOREIGN KEY (`CustomerID`)
-        REFERENCES `pos_db`.`customer` (`CustomerID`),
-    CONSTRAINT `customercoupon_ibfk_2`
-        FOREIGN KEY (`CouponID`)
-        REFERENCES `pos_db`.`coupon` (`CouponID`));
-
 
 CREATE TABLE IF NOT EXISTS `pos_db`.`coupon` (
     `CouponID` INT NOT NULL,
@@ -658,32 +644,66 @@ INSERT INTO coupon(CouponID, DiscountPrice) VALUES(3, 3000);
 INSERT INTO coupon(CouponID, DiscountPrice) VALUES(4, 4000);
 INSERT INTO coupon(CouponID, DiscountPrice) VALUES(5, 5000);
 
-INSERT INTO customercoupon(customerid, couponid, isused) VALUES(1907, 1, 0);
-INSERT INTO customercoupon(customerid, couponid, isused) VALUES(1907, 2, 0);
-INSERT INTO customercoupon(customerid, couponid, isused) VALUES(1907, 3, 0);
-INSERT INTO customercoupon(customerid, couponid, isused) VALUES(1907, 4, 0);
-INSERT INTO customercoupon(customerid, couponid, isused) VALUES(1907, 5, 0);
+-- 멤버십 레벨 삽입 쿼리
+INSERT INTO `pos_db`.`membershiplevel` (`LevelID`, `LevelName`, `DiscountRate`) VALUES
+(1, 'Bronze', 5.00),
+(2, 'Silver', 10.00),
+(3, 'Gold', 15.00);
 
-INSERT INTO customercoupon(customerid, couponid, isused) VALUES(1973, 1, 0);
-INSERT INTO customercoupon(customerid, couponid, isused) VALUES(1973, 2, 0);
-INSERT INTO customercoupon(customerid, couponid, isused) VALUES(1973, 3, 0);
-INSERT INTO customercoupon(customerid, couponid, isused) VALUES(1973, 4, 0);
-INSERT INTO customercoupon(customerid, couponid, isused) VALUES(1973, 5, 0);
-
-INSERT INTO customercoupon(customerid, couponid, isused) VALUES(0641, 1, 0);
-INSERT INTO customercoupon(customerid, couponid, isused) VALUES(0641, 2, 0);
-INSERT INTO customercoupon(customerid, couponid, isused) VALUES(0641, 3, 0);
-INSERT INTO customercoupon(customerid, couponid, isused) VALUES(0641, 4, 0);
-INSERT INTO customercoupon(customerid, couponid, isused) VALUES(0641, 5, 0);
-
-INSERT INTO customercoupon(customerid, couponid, isused) VALUES(4372, 1, 0);
-INSERT INTO customercoupon(customerid, couponid, isused) VALUES(4372, 2, 0);
-INSERT INTO customercoupon(customerid, couponid, isused) VALUES(4372, 3, 0);
-INSERT INTO customercoupon(customerid, couponid, isused) VALUES(4372, 4, 0);
-INSERT INTO customercoupon(customerid, couponid, isused) VALUES(4372, 5, 0);
-
-INSERT INTO membershiplevel(LevelID, LevelName, DiscountRate) VALUES(1, 'Bronze', 5);
-INSERT INTO membershiplevel(LevelID, LevelName, DiscountRate) VALUES(2, 'Silver', 10);
-INSERT INTO membershiplevel(LevelID, LevelName, DiscountRate) VALUES(3, 'Gold', 15);
 
 INSERT INTO membership(LevelID, CustomerID, JoinDate, ExpiryDate, Status) VALUES (3, 1907, 231210,241210, 'active');
+
+
+
+INSERT INTO pos_db.tax (TaxID, TaxName, TaxRate) VALUES
+(1, '부가가치세', 10);
+
+
+
+DELIMITER //
+CREATE FUNCTION GetDiscountRate(customer_id INT) RETURNS DECIMAL(5,2) READS SQL DATA
+BEGIN
+    DECLARE level_discount DECIMAL(5,2);
+
+    SELECT ml.DiscountRate INTO level_discount
+    FROM membership m
+    JOIN membershiplevel ml ON m.LevelID = ml.LevelID
+    WHERE m.CustomerID = customer_id;
+
+    RETURN COALESCE(level_discount, 0);
+END //
+DELIMITER ;
+
+DELIMITER //
+CREATE FUNCTION ApplyDiscount(customer_id INT, purchase_amount DECIMAL(10,2)) RETURNS DECIMAL(10,2) READS SQL DATA
+BEGIN
+    DECLARE discount_rate DECIMAL(5,2);
+
+    -- 레벨별 할인율 가져오기
+    SET discount_rate = GetDiscountRate(customer_id);
+
+    -- 구매 가격에 할인 적용
+    SET purchase_amount = purchase_amount - (purchase_amount * discount_rate / 100);
+
+    RETURN purchase_amount;
+END //
+DELIMITER ;
+
+DELIMITER //
+
+CREATE TRIGGER update_stock_after_orderitem_insert
+AFTER INSERT ON pos_db.orderitem
+FOR EACH ROW
+BEGIN
+  DECLARE purchased_quantity INT;
+
+  -- Get the purchased quantity from the inserted order item
+  SELECT Quantity INTO purchased_quantity FROM pos_db.orderitem WHERE OrderItemID = NEW.OrderItemID;
+
+  -- Update the stock quantity in the product table
+  UPDATE pos_db.product
+  SET StockQuantity = StockQuantity - purchased_quantity
+  WHERE ProductID = NEW.ProductID;
+END //
+
+DELIMITER ;
