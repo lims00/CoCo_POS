@@ -14,6 +14,42 @@
   <component name="DBNavigator.Project.DatabaseConsoleManager">
     <connection id="e7dd7710-5f9e-49f3-a561-099ae24c71e7">
       <console name="Connection" type="STANDARD" schema="" session="Main" />
+      <console name="Connection 1" type="STANDARD" schema="pos_db" session="Main"><![CDATA[-- 데이터베이스 삭제
+DROP DATABASE IF EXISTS pos_db;
+select
+    m.`CustomerID`,
+    m.`ExpiryDate`,
+    m.`JoinDate`,
+    m.`LevelID`,
+    m.`Status`
+from
+    membership m;]]></console>
+      <console name="GetOrdersByDateRange" type="STANDARD" schema="pos_db" session="Main"><![CDATA[DELIMITER //
+
+CREATE FUNCTION GetOrdersByDateRange(start_date DATE, end_date DATE)
+RETURNS TABLE (
+    CustomerID INT,
+    OrderDate DATE,
+    OrderID INT,
+    PaymentMethod VARCHAR(255),
+    TotalAmount DECIMAL(10, 2)
+)
+BEGIN
+    RETURN (
+        SELECT
+            o.`CustomerID`,
+            o.`OrderDate`,
+            o.`OrderID`,
+            o.`PaymentMethod`,
+            o.`TotalAmount`
+        FROM
+            orders o
+        WHERE
+            o.`OrderDate` BETWEEN start_date AND end_date
+    );
+END //
+
+DELIMITER ;]]></console>
     </connection>
   </component>
   <component name="DBNavigator.Project.DatabaseEditorStateManager">
@@ -21,17 +57,23 @@
   </component>
   <component name="DBNavigator.Project.DatabaseFileManager">
     <open-files>
-      <object connection-id="e7dd7710-5f9e-49f3-a561-099ae24c71e7" object-ref="schemas/pos_db/tables/category" />
+      <object connection-id="e7dd7710-5f9e-49f3-a561-099ae24c71e7" object-ref="schemas/pos_db/tables/tax" />
     </open-files>
   </component>
   <component name="DBNavigator.Project.DatasetFilterManager">
     <filter-actions connection-id="e7dd7710-5f9e-49f3-a561-099ae24c71e7" dataset="pos_db.category" active-filter-id="" />
+    <filter-actions connection-id="e7dd7710-5f9e-49f3-a561-099ae24c71e7" dataset="pos_db.membershiplevel" active-filter-id="" />
+    <filter-actions connection-id="e7dd7710-5f9e-49f3-a561-099ae24c71e7" dataset="pos_db.cart" active-filter-id="" />
+    <filter-actions connection-id="e7dd7710-5f9e-49f3-a561-099ae24c71e7" dataset="pos_db.tax" active-filter-id="" />
+    <filter-actions connection-id="e7dd7710-5f9e-49f3-a561-099ae24c71e7" dataset="pos_db.order" active-filter-id="" />
+    <filter-actions connection-id="e7dd7710-5f9e-49f3-a561-099ae24c71e7" dataset="pos_db.membership" active-filter-id="" />
   </component>
   <component name="DBNavigator.Project.ExecutionManager">
     <retain-sticky-names value="false" />
   </component>
   <component name="DBNavigator.Project.FileConnectionMappingManager">
     <mapping file-url="file://$PROJECT_DIR$/pos_db_setup.sql" connection-id="e7dd7710-5f9e-49f3-a561-099ae24c71e7" session-id="MAIN" current-schema="pos_db" />
+    <mapping file-url="file://$PROJECT_DIR$/back/cocopos/sqlFiles/GetOrdersByDateRange.sql" connection-id="e7dd7710-5f9e-49f3-a561-099ae24c71e7" session-id="MAIN" current-schema="pos_db" />
   </component>
   <component name="DBNavigator.Project.ObjectQuickFilterManager">
     <last-used-operator value="EQUAL" />
