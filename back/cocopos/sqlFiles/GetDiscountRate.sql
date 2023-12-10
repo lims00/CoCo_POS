@@ -1,3 +1,5 @@
+ -- 멤버십 레벨별 할인율을 가져오는 함수입니다.
+
 DELIMITER //
 CREATE FUNCTION GetDiscountRate(customer_id INT) RETURNS DECIMAL(5,2) READS SQL DATA
 BEGIN

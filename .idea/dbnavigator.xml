@@ -75,7 +75,6 @@ DELIMITER ;]]></console>
   </component>
   <component name="DBNavigator.Project.FileConnectionMappingManager">
     <mapping file-url="file://$PROJECT_DIR$/pos_db_setup.sql" connection-id="e7dd7710-5f9e-49f3-a561-099ae24c71e7" session-id="MAIN" current-schema="pos_db" />
-    <mapping file-url="file://$PROJECT_DIR$/back/cocopos/sqlFiles/GetOrdersByDateRange.sql" connection-id="e7dd7710-5f9e-49f3-a561-099ae24c71e7" session-id="MAIN" current-schema="pos_db" />
   </component>
   <component name="DBNavigator.Project.ObjectQuickFilterManager">
     <last-used-operator value="EQUAL" />
