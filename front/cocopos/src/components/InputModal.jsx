@@ -14,7 +14,7 @@ const Modal2 = styled.div`
   flex-direction: column;
   position: absolute;
   border-radius: 10px;
-  top: 30%;
+  top: 40%;
   left: 50%;
   transform: translate(-50%, -50%);
   width: 800px;
@@ -23,7 +23,7 @@ const Modal2 = styled.div`
   overflow-y: auto;
   background-color: white;
   align-items: center;
-  padding:10px;
+  padding-top:40px;
 `
 const ModalContent = styled.div`
   margin: 40px;
@@ -53,7 +53,7 @@ height: 40px;
   font-size: 30px;
   width: 200px;
 `
-const InputModal=({isOpen,click,setInput,content,moneyResult=click()})=>{
+const InputModal=({isOpen,click,setInput,content,moneyResult=()=>{}})=>{
     //이거 모달 닫을 때 보내는 input값? 처럼 쓸 예정인데 걍 필요없는듯,,
     const [inputValue,setInputValue]=useState('')
     const CloseModal = () => {

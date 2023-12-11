@@ -19,16 +19,13 @@ const SaleLink = styled(Link)`
   text-decoration: none;
   text-line-through-color: black;
 `
-const IdInput = styled.div`
-  display: flex;
 
-`
 const SaleWrapper = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-
+margin-bottom: 20px;
   width: 500px;
   height: 400px;
   font-size: 25px;
@@ -61,25 +58,43 @@ const SmallBtnWrapper = styled.div`
   display: flex;
   flex-direction: column;
 `
+const Promotion = styled.div`
+  display: flex;
+width:500px;
+  border: 1px solid grey;
+  font-size: 18px;
+  justify-content: center;
+  height: 40px;
+  align-items: center;
+`
+const Detail=styled.div`
+display: flex;
+  height: 45px;
+  align-items: center;
+  margin-left:30px;
+  margin-top:50px;
+  justify-content: center;
+  border: 1px solid grey;
+  border-radius: 10px;
+
+`
 const Main = () => {
     const [searchValue, setSearchValue] = useState('');
-    const handleChange = (e) => {
-        setSearchValue(e.target.value)
-        console.log(searchValue)
-    }
-    const handleSearch = () => {
 
-    }
 
     return (
         <Wrapper>
-            <SaleWrapper>
-                <SaleLink to='/item'>상품 구매</SaleLink>
-            </SaleWrapper>
+            <p style={{display:'flex',flexDirection:'column'}}>
+                <SaleWrapper>
+                    <SaleLink to='/item'>상품 구매</SaleLink>
+                </SaleWrapper>
+                <Promotion>프로모션1</Promotion>
+                <Promotion>프로모션2</Promotion></p>
             <SmallBtnWrapper>
                 <SmallBtn><SaleLink to='/sale'>거래내역</SaleLink></SmallBtn>
                 <SmallBtn><SaleLink to='/return'>반품 및 교환</SaleLink></SmallBtn>
                 <SmallBtn><SaleLink to='/manage'>재고관리</SaleLink></SmallBtn>
+                <Detail><SaleLink to='/'>자세히 보기</SaleLink></Detail>
             </SmallBtnWrapper>
         </Wrapper>
 
