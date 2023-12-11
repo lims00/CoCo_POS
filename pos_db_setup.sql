@@ -616,11 +616,7 @@ DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_0900_ai_ci;
 
 
-CREATE TABLE IF NOT EXISTS `pos_db`.`tax` (
-    `TaxID` INT NOT NULL,
-    `TaxName` VARCHAR(50) NOT NULL,
-    `TaxRate` Int NOT NULL,
-    PRIMARY KEY (`TaxID`));
+
 
 
 SET SQL_MODE=@OLD_SQL_MODE;
@@ -649,6 +645,7 @@ INSERT INTO `pos_db`.`membershiplevel` (`LevelID`, `LevelName`, `DiscountRate`) 
 (1, 'Bronze', 5.00),
 (2, 'Silver', 10.00),
 (3, 'Gold', 15.00);
+<<<<<<< HEAD
 
 
 INSERT INTO membership(LevelID, CustomerID, JoinDate, ExpiryDate, Status) VALUES (3, 1907, 231210,241210, 'active');
@@ -660,6 +657,17 @@ INSERT INTO pos_db.tax (TaxID, TaxName, TaxRate) VALUES
 
 
 
+=======
+
+
+INSERT INTO membership(LevelID, CustomerID, JoinDate, ExpiryDate, Status) VALUES (3, 1907, 231210,241210, 'active');
+
+
+
+
+
+
+>>>>>>> 2e7b4a8bba54e95972f3c2a83025960f8376a811
 DELIMITER //
 CREATE FUNCTION GetDiscountRate(customer_id INT) RETURNS DECIMAL(5,2) READS SQL DATA
 BEGIN
@@ -706,4 +714,58 @@ BEGIN
   WHERE ProductID = NEW.ProductID;
 END //
 
+<<<<<<< HEAD
+=======
+DELIMITER ;
+
+-- 총 가격의 10%를 계산하는 함수
+DELIMITER //
+CREATE FUNCTION calculate_tax(total_price INT) RETURNS INT
+DETERMINISTIC
+BEGIN
+    DECLARE tax_rate DECIMAL(5,2) DEFAULT 0.10;
+    DECLARE tax_amount INT;
+
+    SET tax_amount = ROUND(total_price * tax_rate);
+    RETURN tax_amount;
+END //
+DELIMITER ;
+
+-- 세금을 포함한 전체 가격을 계산하는 함수
+DELIMITER //
+CREATE FUNCTION calculate_total_with_tax(total_price INT) RETURNS INT
+DETERMINISTIC
+BEGIN
+    DECLARE tax_amount INT;
+
+    SET tax_amount = calculate_tax(total_price);
+    RETURN total_price + tax_amount;
+END //
+DELIMITER ;
+
+-- 멤버십 만료인지 확인하고 만료 기간이 현재 날짜보다 이전이면 status를 만료로 update하는 트리거
+CREATE TRIGGER membership_expiry_trigger
+BEFORE INSERT ON membership
+FOR EACH ROW
+BEGIN
+    IF NEW.ExpiryDate IS NOT NULL AND NEW.ExpiryDate < CURDATE() THEN
+        SET NEW.Status = 'expired';
+    END IF;
+END;
+//
+
+DELIMITER ;
+
+DELIMITER //
+CREATE TRIGGER membership_update_trigger
+BEFORE UPDATE ON membership
+FOR EACH ROW
+BEGIN
+    IF NEW.ExpiryDate IS NOT NULL AND NEW.ExpiryDate < CURDATE() THEN
+        SET NEW.Status = 'expired';
+    END IF;
+END;
+//
+
+>>>>>>> 2e7b4a8bba54e95972f3c2a83025960f8376a811
 DELIMITER ;

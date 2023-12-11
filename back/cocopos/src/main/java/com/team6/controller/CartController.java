@@ -2,6 +2,7 @@ package com.team6.controller;
 
 import com.google.gson.Gson;
 import com.team6.dao.*;
+import com.team6.entity.CartItem;
 import com.team6.entity.Customer;
 import com.team6.entity.Membership;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,6 +47,4 @@ public class CartController {
 
         return info;
     }
-
-
 }
