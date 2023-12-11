@@ -5,14 +5,7 @@ import {Link} from "react-router-dom";
 import Sale from "./Sale";
 
 
-const SaleBtn = styled.button`
-  width: 400px;
-  height: 50px;
-  margin-top: 30px;
-  border-radius: 10px;
-  border: 1px solid grey;
-  background-color: white;
-`
+
 const SaleLink = styled(Link)`
 
   font-size: 20px;
@@ -25,7 +18,7 @@ const SaleWrapper = styled.div`
   flex-direction: column;
   justify-content: center;
   align-items: center;
-margin-bottom: 20px;
+  margin-bottom: 20px;
   width: 500px;
   height: 400px;
   font-size: 25px;
@@ -88,8 +81,8 @@ const Main = () => {
                 <SaleWrapper>
                     <SaleLink to='/item'>상품 구매</SaleLink>
                 </SaleWrapper>
-                <Promotion>프로모션1</Promotion>
-                <Promotion>프로모션2</Promotion></p>
+                <Promotion>블랙프라이데이 12/1~12/15</Promotion>
+                <Promotion>vip 회원 대상 증정품 제공 행사중</Promotion></p>
             <SmallBtnWrapper>
                 <SmallBtn><SaleLink to='/sale'>거래내역</SaleLink></SmallBtn>
                 <SmallBtn><SaleLink to='/return'>반품 및 교환</SaleLink></SmallBtn>
