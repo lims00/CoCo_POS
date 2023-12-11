@@ -43,19 +43,6 @@ ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_0900_ai_ci;
 
-CREATE TABLE IF NOT EXISTS `pos_db`.`customercoupon` (
-    `CustomerID` INT NOT NULL,
-    `CouponID` INT NOT NULL,
-    `IsUsed` INT NOT NULL,
-    PRIMARY KEY (`CustomerID`, `CouponID`),
-    CONSTRAINT `customercoupon_ibfk_1`
-        FOREIGN KEY (`CustomerID`)
-        REFERENCES `pos_db`.`customer` (`CustomerID`),
-    CONSTRAINT `customercoupon_ibfk_2`
-        FOREIGN KEY (`CouponID`)
-        REFERENCES `pos_db`.`coupon` (`CouponID`));
-
-
 CREATE TABLE IF NOT EXISTS `pos_db`.`coupon` (
     `CouponID` INT NOT NULL,
     `DiscountPrice` INT NOT NULL,
@@ -629,11 +616,7 @@ DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_0900_ai_ci;
 
 
-CREATE TABLE IF NOT EXISTS `pos_db`.`tax` (
-    `TaxID` INT NOT NULL,
-    `TaxName` VARCHAR(50) NOT NULL,
-    `TaxRate` Int NOT NULL,
-    PRIMARY KEY (`TaxID`));
+
 
 
 SET SQL_MODE=@OLD_SQL_MODE;
@@ -657,37 +640,89 @@ INSERT INTO coupon(CouponID, DiscountPrice) VALUES(3, 3000);
 INSERT INTO coupon(CouponID, DiscountPrice) VALUES(4, 4000);
 INSERT INTO coupon(CouponID, DiscountPrice) VALUES(5, 5000);
 
-INSERT INTO customercoupon(customerid, couponid, isused) VALUES(1907, 1, 0);
-INSERT INTO customercoupon(customerid, couponid, isused) VALUES(1907, 2, 0);
-INSERT INTO customercoupon(customerid, couponid, isused) VALUES(1907, 3, 0);
-INSERT INTO customercoupon(customerid, couponid, isused) VALUES(1907, 4, 0);
-INSERT INTO customercoupon(customerid, couponid, isused) VALUES(1907, 5, 0);
-
-INSERT INTO customercoupon(customerid, couponid, isused) VALUES(1973, 1, 0);
-INSERT INTO customercoupon(customerid, couponid, isused) VALUES(1973, 2, 0);
-INSERT INTO customercoupon(customerid, couponid, isused) VALUES(1973, 3, 0);
-INSERT INTO customercoupon(customerid, couponid, isused) VALUES(1973, 4, 0);
-INSERT INTO customercoupon(customerid, couponid, isused) VALUES(1973, 5, 0);
-
-INSERT INTO customercoupon(customerid, couponid, isused) VALUES(0641, 1, 0);
-INSERT INTO customercoupon(customerid, couponid, isused) VALUES(0641, 2, 0);
-INSERT INTO customercoupon(customerid, couponid, isused) VALUES(0641, 3, 0);
-INSERT INTO customercoupon(customerid, couponid, isused) VALUES(0641, 4, 0);
-INSERT INTO customercoupon(customerid, couponid, isused) VALUES(0641, 5, 0);
-
-INSERT INTO customercoupon(customerid, couponid, isused) VALUES(4372, 1, 0);
-INSERT INTO customercoupon(customerid, couponid, isused) VALUES(4372, 2, 0);
-INSERT INTO customercoupon(customerid, couponid, isused) VALUES(4372, 3, 0);
-INSERT INTO customercoupon(customerid, couponid, isused) VALUES(4372, 4, 0);
-INSERT INTO customercoupon(customerid, couponid, isused) VALUES(4372, 5, 0);
-
-
-
 -- 멤버십 레벨 삽입 쿼리
 INSERT INTO `pos_db`.`membershiplevel` (`LevelID`, `LevelName`, `DiscountRate`) VALUES
 (1, 'Bronze', 5.00),
 (2, 'Silver', 10.00),
 (3, 'Gold', 15.00);
 
-INSERT INTO pos_db.tax (TaxID, TaxName, TaxRate) VALUES
-(1, '부가가치세', 10);
+
+INSERT INTO membership(LevelID, CustomerID, JoinDate, ExpiryDate, Status) VALUES (3, 1907, 231210,241210, 'active');
+
+
+
+
+
+
+DELIMITER //
+CREATE FUNCTION GetDiscountRate(customer_id INT) RETURNS DECIMAL(5,2) READS SQL DATA
+BEGIN
+    DECLARE level_discount DECIMAL(5,2);
+
+    SELECT ml.DiscountRate INTO level_discount
+    FROM membership m
+    JOIN membershiplevel ml ON m.LevelID = ml.LevelID
+    WHERE m.CustomerID = customer_id;
+
+    RETURN COALESCE(level_discount, 0);
+END //
+DELIMITER ;
+
+DELIMITER //
+CREATE FUNCTION ApplyDiscount(customer_id INT, purchase_amount DECIMAL(10,2)) RETURNS DECIMAL(10,2) READS SQL DATA
+BEGIN
+    DECLARE discount_rate DECIMAL(5,2);
+
+    -- 레벨별 할인율 가져오기
+    SET discount_rate = GetDiscountRate(customer_id);
+
+    -- 구매 가격에 할인 적용
+    SET purchase_amount = purchase_amount - (purchase_amount * discount_rate / 100);
+
+    RETURN purchase_amount;
+END //
+DELIMITER ;
+
+DELIMITER //
+
+CREATE TRIGGER update_stock_after_orderitem_insert
+AFTER INSERT ON pos_db.orderitem
+FOR EACH ROW
+BEGIN
+  DECLARE purchased_quantity INT;
+
+  -- Get the purchased quantity from the inserted order item
+  SELECT Quantity INTO purchased_quantity FROM pos_db.orderitem WHERE OrderItemID = NEW.OrderItemID;
+
+  -- Update the stock quantity in the product table
+  UPDATE pos_db.product
+  SET StockQuantity = StockQuantity - purchased_quantity
+  WHERE ProductID = NEW.ProductID;
+END //
+
+DELIMITER ;
+
+-- 총 가격의 10%를 계산하는 함수
+DELIMITER //
+CREATE FUNCTION calculate_tax(total_price INT) RETURNS INT
+DETERMINISTIC
+BEGIN
+    DECLARE tax_rate DECIMAL(5,2) DEFAULT 0.10;
+    DECLARE tax_amount INT;
+
+    SET tax_amount = ROUND(total_price * tax_rate);
+    RETURN tax_amount;
+END //
+DELIMITER ;
+
+-- 세금을 포함한 전체 가격을 계산하는 함수
+DELIMITER //
+CREATE FUNCTION calculate_total_with_tax(total_price INT) RETURNS INT
+DETERMINISTIC
+BEGIN
+    DECLARE tax_amount INT;
+
+    SET tax_amount = calculate_tax(total_price);
+    RETURN total_price + tax_amount;
+END //
+DELIMITER ;
