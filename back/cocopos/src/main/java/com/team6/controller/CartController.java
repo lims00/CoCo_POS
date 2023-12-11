@@ -2,10 +2,7 @@ package com.team6.controller;
 
 import com.google.gson.Gson;
 import com.team6.dao.*;
-import com.team6.entity.CartItem;
-import com.team6.entity.Customer;
-import com.team6.entity.Membership;
-import com.team6.entity.Product;
+import com.team6.entity.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.json.simple.JSONArray;
@@ -32,24 +29,26 @@ public class CartController {
     @Autowired
     ProductRepository productRepository;
 
+    @Autowired
+    PromotionRepository promotionRepository;
+
     @GetMapping("/customercart/{customerId}")
     public JSONObject customerCart(@PathVariable int customerId) {
+        JSONObject json = new JSONObject();
+
         Membership membership = membershipRepository.getByCustomerId(customerId);
         Customer customer = customerRepository.getById(customerId);
-
-        JSONObject info = new JSONObject();
-        Gson gson = new Gson();
+        Promotion promotion = promotionRepository.getPromotionById(1);
 
 
-        info.put("customerName", customer.getFirstName() + ' ' + customer.getLastName());
-        info.put("customerId", customer.getCustomerId());
-        info.put("membershipLevel", membership.getLevelId());
 
+        json.put("customerName", customer.getFirstName() + ' ' + customer.getLastName());
+        json.put("customerId", customer.getCustomerId());
+        json.put("membershipLevel", membership.getLevelId());
+        json.put("promotionName", promotion.getPromotionName());
+        json.put("promotionDesc", promotion.getPromotionDescription());
 
-        System.out.println(customer.getFirstName() + ' ' + customer.getLastName());
-        System.out.println(membership.getLevelId());
-
-        return info;
+        return json;
     }
 
     /*
@@ -70,7 +69,6 @@ public class CartController {
         return json;
     }
 
-    /* 회원 id입력하면, 프로모션 정보알려주는 api */
     /* 할인 쿠폰 입력하면 가격 계산...(이건 그냥 front에서 처리해도 될듯) */
     /* 최근 거래 내역(주문번호,거래일, 총금액) d알려주는 api */
     /* 반품도 (최근 거래 내역과 동일한 정보 필요) 반품할 물건 알려주는 api */
