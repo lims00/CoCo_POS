@@ -726,3 +726,29 @@ BEGIN
     RETURN total_price + tax_amount;
 END //
 DELIMITER ;
+
+-- 멤버십 만료인지 확인하고 만료 기간이 현재 날짜보다 이전이면 status를 만료로 update하는 트리거
+CREATE TRIGGER membership_expiry_trigger
+BEFORE INSERT ON membership
+FOR EACH ROW
+BEGIN
+    IF NEW.ExpiryDate IS NOT NULL AND NEW.ExpiryDate < CURDATE() THEN
+        SET NEW.Status = 'expired';
+    END IF;
+END;
+//
+
+DELIMITER ;
+
+DELIMITER //
+CREATE TRIGGER membership_update_trigger
+BEFORE UPDATE ON membership
+FOR EACH ROW
+BEGIN
+    IF NEW.ExpiryDate IS NOT NULL AND NEW.ExpiryDate < CURDATE() THEN
+        SET NEW.Status = 'expired';
+    END IF;
+END;
+//
+
+DELIMITER ;
