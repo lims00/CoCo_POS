@@ -14,7 +14,7 @@ const Modal2 = styled.div`
   flex-direction: column;
   position: absolute;
   border-radius: 10px;
-  top: 30%;
+  top: 40%;
   left: 50%;
   transform: translate(-50%, -50%);
   width: 800px;
@@ -23,7 +23,7 @@ const Modal2 = styled.div`
   overflow-y: auto;
   background-color: white;
   align-items: center;
-  padding: 10px;
+  padding-top: 40px;
 `
 const ModalContent = styled.div`
   margin: 40px;
@@ -47,12 +47,7 @@ const ModalBtn = styled.button`
   margin-bottom: 20px;
 `
 
-const ModalInput = styled.input`
-  height: 40px;
-  margin-top: 30px;
-  font-size: 30px;
-  width: 200px;
-`
+
 const AlertModal = ({isOpen, click, content}) => {
 
     const CloseModal = () => {

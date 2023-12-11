@@ -15,7 +15,7 @@ const Modal2 = styled.div`
   flex-direction: column;
   position: absolute;
   border-radius: 10px;
-  top: 30%;
+  top: 40%;
   left: 50%;
   transform: translate(-50%, -50%);
   width: 800px;
@@ -24,7 +24,7 @@ const Modal2 = styled.div`
   overflow-y: auto;
   background-color: white;
   align-items: center;
-  padding:10px;
+  padding-top:40px;
 `
 const ModalContent = styled.div`
   display: flex;
@@ -56,7 +56,7 @@ const Tittle=styled.div`
   display: flex;
   justify-content: center;
     margin-right: 20px;
-  width: 80px;
+  width: 100px;
 
 `
 const MoneyModal=({isOpen,click,setInput,total,inputMoney})=>{

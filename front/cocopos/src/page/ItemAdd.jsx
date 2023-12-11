@@ -103,30 +103,6 @@ const ItemAdd = () => {
     const [moneyPayOpen, setMoneyPayOpen]=useState(false);
     const [moneyPayResultOpen,setMoneyPayResultOpen]=useState(false);
     const [moneyInput,setMoneyInput]=useState('');
-
-    const handleItem = (e) => {
-        setSearchItem(e.target.value)
-        console.log(searchItem)
-    }
-    const handleCnt = (e) => {
-        setSearchCnt(e.target.value)
-        console.log(searchCnt)
-    }
-    const handleAdd = () => {
-
-    }
-
-    const handleCardPay=()=>{
-        setCardPayOpen(true);
-
-    }
-
-    const handleMoneyPay=()=>{
-        setMoneyPayOpen(true);
-    }
-
-
-
     const headers =
         [
             {
@@ -165,6 +141,28 @@ const ItemAdd = () => {
     const headerKey = [
         'id', 'name', 'cnt', 'cost', 'totalCost'
     ]
+    const handleItem = (e) => {
+        setSearchItem(e.target.value)
+        console.log(searchItem)
+    }
+    const handleCnt = (e) => {
+        setSearchCnt(e.target.value)
+        console.log(searchCnt)
+    }
+    const handleAdd = () => {
+
+    }
+
+    const handleCardPay=()=>{
+        setCardPayOpen(true);
+
+    }
+
+    const handleMoneyPay=()=>{
+        setMoneyPayOpen(true);
+    }
+
+
     return (
         <Wrapper>
             <InputModal isOpen={modalOpen} content={"회원 번호를 입력하세요."} setInput={setCustomerId} click={setModalOpen}/>
