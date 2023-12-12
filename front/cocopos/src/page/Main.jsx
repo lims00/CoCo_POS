@@ -85,7 +85,7 @@ const Main = () => {
                 <Promotion>vip 회원 대상 증정품 제공 행사중</Promotion></p>
             <SmallBtnWrapper>
                 <SmallBtn><SaleLink to='/sale'>거래내역</SaleLink></SmallBtn>
-                <SmallBtn><SaleLink to='/return'>반품 및 교환</SaleLink></SmallBtn>
+                <SmallBtn><SaleLink to='/return'>반품</SaleLink></SmallBtn>
                 <SmallBtn><SaleLink to='/manage'>재고관리</SaleLink></SmallBtn>
                 <Detail><SaleLink to='/'>자세히 보기</SaleLink></Detail>
             </SmallBtnWrapper>
