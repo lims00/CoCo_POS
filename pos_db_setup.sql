@@ -68,8 +68,9 @@ CREATE TABLE IF NOT EXISTS `pos_db`.`orders` (
   `OrderID` INT NOT NULL,
   `CustomerID` INT NULL DEFAULT NULL,
   `PaymentMethodID` INT NOT NULL,
-  `DiscountedPrice` INT NOT NULL DEFAULT 0,
+  `CouponID` INT DEFAULT NULL,
   `OrderDate` DATE NULL DEFAULT NULL,
+  `DiscountedTotalAmount` INT NOT NULL DEFAULT 0,
   `TotalAmount` DECIMAL(10,2) NULL DEFAULT NULL,
   PRIMARY KEY (`OrderID`),
   INDEX `CustomerID` (`CustomerID` ASC) VISIBLE,
@@ -78,7 +79,11 @@ CREATE TABLE IF NOT EXISTS `pos_db`.`orders` (
     REFERENCES `pos_db`.`customer` (`CustomerID`),
   CONSTRAINT `order_ibfk_2`
     FOREIGN KEY (`PaymentMethodID`)
-    REFERENCES `pos_db`.`paymentmethod` (`PaymentMethodID`))
+    REFERENCES `pos_db`.`paymentmethod` (`PaymentMethodID`),
+  CONSTRAINT `order_ibfk_3`
+    FOREIGN KEY (`CouponID`)
+    REFERENCES `pos_db`.`coupon` (`CouponID`)
+    )
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_0900_ai_ci;
@@ -708,3 +713,53 @@ END //
 
 DELIMITER ;
 
+
+DELIMITER //
+CREATE TRIGGER membership_expiry_trigger
+BEFORE INSERT ON membership
+FOR EACH ROW
+BEGIN
+    IF NEW.ExpiryDate IS NOT NULL AND NEW.ExpiryDate < CURDATE() THEN
+        SET NEW.Status = 'expired';
+    END IF;
+END;
+//
+DELIMITER ;
+
+DELIMITER //
+CREATE TRIGGER membership_update_trigger
+BEFORE UPDATE ON membership
+FOR EACH ROW
+BEGIN
+    IF NEW.ExpiryDate IS NOT NULL AND NEW.ExpiryDate < CURDATE() THEN
+        SET NEW.Status = 'expired';
+    END IF;
+END;
+//
+DELIMITER ;
+
+
+-- 총 가격의 10%를 계산하는 함수
+DELIMITER //
+CREATE FUNCTION calculate_tax(total_price INT) RETURNS INT
+DETERMINISTIC
+BEGIN
+    DECLARE tax_rate DECIMAL(5,2) DEFAULT 0.10;
+    DECLARE tax_amount INT;
+
+    SET tax_amount = ROUND(total_price * tax_rate);
+    RETURN tax_amount;
+END //
+DELIMITER ;
+
+-- 세금을 포함한 전체 가격을 계산하는 함수
+DELIMITER //
+CREATE FUNCTION calculate_total_with_tax(total_price INT) RETURNS INT
+DETERMINISTIC
+BEGIN
+    DECLARE tax_amount INT;
+
+    SET tax_amount = calculate_tax(total_price);
+    RETURN total_price + tax_amount;
+END //
+DELIMITER ;
