@@ -68,6 +68,7 @@ CREATE TABLE IF NOT EXISTS `pos_db`.`orders` (
   `OrderID` INT NOT NULL,
   `CustomerID` INT NULL DEFAULT NULL,
   `PaymentMethodID` INT NOT NULL,
+  `DiscountedPrice` INT NOT NULL DEFAULT 0,
   `OrderDate` DATE NULL DEFAULT NULL,
   `TotalAmount` DECIMAL(10,2) NULL DEFAULT NULL,
   PRIMARY KEY (`OrderID`),
@@ -498,19 +499,19 @@ COLLATE = utf8mb4_0900_ai_ci;
 CREATE TABLE IF NOT EXISTS `pos_db`.`returnexchangeitem` (
   `ReturnExchangeItemID` INT NOT NULL,
   `ReturnExchangeID` INT NULL DEFAULT NULL,
-  `SaleItemID` INT NULL DEFAULT NULL,
+  `OrderItemID` INT NULL DEFAULT NULL,
   `Quantity` INT NULL DEFAULT NULL,
   `UnitPrice` DECIMAL(10,2) NULL DEFAULT NULL,
   `Subtotal` DECIMAL(10,2) NULL DEFAULT NULL,
   PRIMARY KEY (`ReturnExchangeItemID`),
   INDEX `ReturnExchangeID` (`ReturnExchangeID` ASC) VISIBLE,
-  INDEX `SaleItemID` (`SaleItemID` ASC) VISIBLE,
+  INDEX `OrderItemID` (`OrderItemID` ASC) VISIBLE,
   CONSTRAINT `returnexchangeitem_ibfk_1`
     FOREIGN KEY (`ReturnExchangeID`)
     REFERENCES `pos_db`.`returnexchange` (`ReturnExchangeID`),
   CONSTRAINT `returnexchangeitem_ibfk_2`
-    FOREIGN KEY (`SaleItemID`)
-    REFERENCES `pos_db`.`saleitem` (`SaleItemID`))
+    FOREIGN KEY (`OrderItemID`)
+    REFERENCES `pos_db`.`orderitem` (`OrderItemID`))
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_0900_ai_ci;
@@ -631,9 +632,11 @@ INSERT INTO customer(CustomerID, FirstName, LastName, Email, PhoneNumber, Addres
 VALUES(0641, 'SuHyun', 'Lim', 'lsh@cau.co.kr', 01012345678, 'CAU');
 INSERT INTO customer(CustomerID, FirstName, LastName, Email, PhoneNumber, Address)
 VALUES(4372, 'SooMin', 'Bae', 'bsm@cau.ac.kr', 01012345678, 'CAU');
-#INSERT INTO customer(CustomerID, FirstName, LastName, Email, PhoneNumber, Address)
-#VALUES(1973, 'YoHan', 'shin', 'syh@cau.ac.r', 01012345678, 'CAU');
+INSERT INTO customer(CustomerID, FirstName, LastName, Email, PhoneNumber, Address)
+VALUES(6641, 'YoHan', 'shin', 'syh@cau.ac.r', 01012345678, 'CAU');
 
+
+INSERT INTO coupon(CouponID, DiscountPrice) VALUES(0, 0);
 INSERT INTO coupon(CouponID, DiscountPrice) VALUES(1, 1000);
 INSERT INTO coupon(CouponID, DiscountPrice) VALUES(2, 2000);
 INSERT INTO coupon(CouponID, DiscountPrice) VALUES(3, 3000);
