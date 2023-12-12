@@ -8,6 +8,7 @@ import Price from "../components/Price";
 import {Link} from "react-router-dom";
 import AlertModal from "../components/AlertModal";
 import MoneyModal from "../components/MoneyModal";
+import axios from "axios";
 
 const Wrapper = styled.div`
   margin-top: 70px;
@@ -72,6 +73,7 @@ const ItemWrapper = styled.div`
 const PaymentWrapper = styled.div`
   display: flex;
   flex-direction: row;
+
 `
 const PaymentLink = styled(Link)`
 
@@ -92,18 +94,30 @@ const PaymentBtn = styled.div`
   margin-top: 20px;
 
 `
+
+const PurchaseBtn = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 250px;
+  height: 100px;
+  border-radius: 10px;
+  border: 1px solid grey;
+  margin-left: 10px;
+  margin-top: 20px;
+`
 const ItemAdd = () => {
 
     const [searchItem, setSearchItem] = useState('');
     const [customerId, setCustomerId] = useState('');
     const [searchCnt, setSearchCnt] = useState('');
     const [modalOpen, setModalOpen] = useState(true);
-    const [couponId,setCoupon]=useState('');
-    const [cardPayOpen,setCardPayOpen]=useState(false);
-    const [moneyPayOpen, setMoneyPayOpen]=useState(false);
-    const [moneyPayResultOpen,setMoneyPayResultOpen]=useState(false);
-    const [moneyInput,setMoneyInput]=useState('');
-    const [paymentOpen,setpaymentOpen]=useState(false);
+    const [couponId, setCoupon] = useState('');
+    const [cardPayOpen, setCardPayOpen] = useState(false);
+    const [moneyPayOpen, setMoneyPayOpen] = useState(false);
+    const [moneyPayResultOpen, setMoneyPayResultOpen] = useState(false);
+    const [moneyInput, setMoneyInput] = useState('');
+    const [paymentOpen, setPaymentOpen] = useState(false);
     const headers =
         [
             {
@@ -154,18 +168,33 @@ const ItemAdd = () => {
 
     }
 
-    const handleCardPay=()=>{
+    const handleCardPay = () => {
         setCardPayOpen(true);
 
     }
 
-    const handleMoneyPay=()=>{
+    const handleMoneyPay = () => {
         setMoneyPayOpen(true);
     }
 
-    const handlePayment=()=>{
-        setpaymentOpen(true);
+    const handlePayment = () => {
+        setPaymentOpen(true);
     }
+
+    useEffect(() => {
+        if (customerId !== '') {
+            console.log(customerId);
+            axios({
+                method: "GET",
+                url: `http://localhost:8080/customercart/${customerId}`,
+
+            }).then((response) => {
+                console.log(response)
+            }).catch((e)=>{
+                console.log(e.toString())
+            })
+        }
+    }, [customerId])
 
     return (
         <Wrapper>
@@ -204,7 +233,7 @@ const ItemAdd = () => {
                     <TableForm header={headers} items={items} headerKey={headerKey}/>
                     <CustomerInfoWrapper>
                         <CustomerInfoBox title={"회원 아이디"} content={customerId}/>
-                        <CustomerInfoBox title={"할인 쿠폰"} content={couponId} handleChange={setCoupon} inputBox={true} />
+                        <CustomerInfoBox title={"할인 쿠폰"} content={couponId} handleChange={setCoupon} inputBox={true}/>
                         <CustomerInfoBox title={"멤버십"} content={customerId}/>
                     </CustomerInfoWrapper></p>
 
@@ -212,21 +241,23 @@ const ItemAdd = () => {
                     <Promotion></Promotion>
                     가격 정보
                     <PriceWrapper>
-
                         <Price subject={'상품 가격'} num={1000}/>
                         <Price subject={'부과세(10%)'} num={1000}/>
                         <Price subject={'총 가격'} num={1000}/>
                     </PriceWrapper>
                     <PaymentWrapper>
-                        <button onClick={handlePayment}> 구매하기</button>
+                        <p style={{'display': paymentOpen ? "none" : "block"}}>
+                            <PurchaseBtn onClick={handlePayment}> 구매하기</PurchaseBtn></p>
                         <p style={{'display': paymentOpen ? "block" : "none"}}>
-                        <PaymentBtn onClick={handleCardPay}>카드 결제</PaymentBtn>
-                        <PaymentBtn onClick={handleMoneyPay}>현금 결제</PaymentBtn>
-                        </p>
+                            <PaymentBtn onClick={handleCardPay}>카드 결제</PaymentBtn></p>
+                        <p style={{'display': paymentOpen ? "block" : "none"}}>
+                            <PaymentBtn onClick={handleMoneyPay}>현금 결제</PaymentBtn></p>
                     </PaymentWrapper>
                     <AlertModal isOpen={cardPayOpen} content={"카드를 삽입해 주세요."} click={setCardPayOpen}/>
-                    <InputModal isOpen={moneyPayOpen} content={"받은 금액을 입력해주세요."} click={setMoneyPayOpen} setInput={setMoneyInput} moneyResult={setMoneyPayResultOpen}/>
-                    <MoneyModal isOpen={moneyPayResultOpen} click={setMoneyPayResultOpen} total={1500} inputMoney={moneyInput} ></MoneyModal>
+                    <InputModal isOpen={moneyPayOpen} content={"받은 금액을 입력해주세요."} click={setMoneyPayOpen}
+                                setInput={setMoneyInput} moneyResult={setMoneyPayResultOpen}/>
+                    <MoneyModal isOpen={moneyPayResultOpen} click={setMoneyPayResultOpen} total={1500}
+                                inputMoney={moneyInput}></MoneyModal>
                 </p>
 
             </ItemWrapper>
