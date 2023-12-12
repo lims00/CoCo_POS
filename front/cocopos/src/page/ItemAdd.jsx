@@ -72,6 +72,7 @@ const ItemWrapper = styled.div`
 const PaymentWrapper = styled.div`
   display: flex;
   flex-direction: row;
+
 `
 const PaymentLink = styled(Link)`
 
@@ -90,6 +91,19 @@ const PaymentBtn = styled.div`
   border: 1px solid grey;
   margin-left: 10px;
   margin-top: 20px;
+
+`
+
+const PurchaseBtn=styled.div`
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 250px;
+    height: 100px;
+    border-radius: 10px;
+    border: 1px solid grey;
+    margin-left: 10px;
+    margin-top: 20px;
 
 `
 const ItemAdd = () => {
@@ -212,17 +226,17 @@ const ItemAdd = () => {
                     <Promotion></Promotion>
                     가격 정보
                     <PriceWrapper>
-
                         <Price subject={'상품 가격'} num={1000}/>
                         <Price subject={'부과세(10%)'} num={1000}/>
                         <Price subject={'총 가격'} num={1000}/>
                     </PriceWrapper>
                     <PaymentWrapper>
-                        <button onClick={handlePayment}> 구매하기</button>
+                        <p style={{'display': paymentOpen ? "none" : "block"}}>
+                        <PurchaseBtn onClick={handlePayment}> 구매하기</PurchaseBtn></p>
                         <p style={{'display': paymentOpen ? "block" : "none"}}>
-                        <PaymentBtn onClick={handleCardPay}>카드 결제</PaymentBtn>
-                        <PaymentBtn onClick={handleMoneyPay}>현금 결제</PaymentBtn>
-                        </p>
+                        <PaymentBtn onClick={handleCardPay}>카드 결제</PaymentBtn></p>
+                        <p style={{'display': paymentOpen ? "block" : "none"}}>
+                        <PaymentBtn onClick={handleMoneyPay}>현금 결제</PaymentBtn></p>
                     </PaymentWrapper>
                     <AlertModal isOpen={cardPayOpen} content={"카드를 삽입해 주세요."} click={setCardPayOpen}/>
                     <InputModal isOpen={moneyPayOpen} content={"받은 금액을 입력해주세요."} click={setMoneyPayOpen} setInput={setMoneyInput} moneyResult={setMoneyPayResultOpen}/>
