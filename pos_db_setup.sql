@@ -43,19 +43,6 @@ ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_0900_ai_ci;
 
-CREATE TABLE IF NOT EXISTS `pos_db`.`customercoupon` (
-    `CustomerID` INT NOT NULL,
-    `CouponID` INT NOT NULL,
-    `IsUsed` INT NOT NULL,
-    PRIMARY KEY (`CustomerID`, `CouponID`),
-    CONSTRAINT `customercoupon_ibfk_1`
-        FOREIGN KEY (`CustomerID`)
-        REFERENCES `pos_db`.`customer` (`CustomerID`),
-    CONSTRAINT `customercoupon_ibfk_2`
-        FOREIGN KEY (`CouponID`)
-        REFERENCES `pos_db`.`coupon` (`CouponID`));
-
-
 CREATE TABLE IF NOT EXISTS `pos_db`.`coupon` (
     `CouponID` INT NOT NULL,
     `DiscountPrice` INT NOT NULL,
@@ -81,6 +68,7 @@ CREATE TABLE IF NOT EXISTS `pos_db`.`orders` (
   `OrderID` INT NOT NULL,
   `CustomerID` INT NULL DEFAULT NULL,
   `PaymentMethodID` INT NOT NULL,
+  `DiscountedPrice` INT NOT NULL DEFAULT 0,
   `OrderDate` DATE NULL DEFAULT NULL,
   `TotalAmount` DECIMAL(10,2) NULL DEFAULT NULL,
   PRIMARY KEY (`OrderID`),
@@ -265,8 +253,8 @@ COLLATE = utf8mb4_0900_ai_ci;
 CREATE TABLE IF NOT EXISTS `pos_db`.`promotion` (
   `PromotionID` INT NOT NULL,
   `PromotionName` VARCHAR(255) NULL DEFAULT NULL,
-  `StartDate` DATETIME NULL DEFAULT NULL,
-  `EndDate` DATETIME NULL DEFAULT NULL,
+  `StartDate` DATE NULL DEFAULT NULL,
+  `EndDate` DATE NULL DEFAULT NULL,
   `DiscountRate` DECIMAL(5,2) NULL DEFAULT NULL,
   `PromotionDescription` TEXT NULL DEFAULT NULL,
   PRIMARY KEY (`PromotionID`))
@@ -511,19 +499,19 @@ COLLATE = utf8mb4_0900_ai_ci;
 CREATE TABLE IF NOT EXISTS `pos_db`.`returnexchangeitem` (
   `ReturnExchangeItemID` INT NOT NULL,
   `ReturnExchangeID` INT NULL DEFAULT NULL,
-  `SaleItemID` INT NULL DEFAULT NULL,
+  `OrderItemID` INT NULL DEFAULT NULL,
   `Quantity` INT NULL DEFAULT NULL,
   `UnitPrice` DECIMAL(10,2) NULL DEFAULT NULL,
   `Subtotal` DECIMAL(10,2) NULL DEFAULT NULL,
   PRIMARY KEY (`ReturnExchangeItemID`),
   INDEX `ReturnExchangeID` (`ReturnExchangeID` ASC) VISIBLE,
-  INDEX `SaleItemID` (`SaleItemID` ASC) VISIBLE,
+  INDEX `OrderItemID` (`OrderItemID` ASC) VISIBLE,
   CONSTRAINT `returnexchangeitem_ibfk_1`
     FOREIGN KEY (`ReturnExchangeID`)
     REFERENCES `pos_db`.`returnexchange` (`ReturnExchangeID`),
   CONSTRAINT `returnexchangeitem_ibfk_2`
-    FOREIGN KEY (`SaleItemID`)
-    REFERENCES `pos_db`.`saleitem` (`SaleItemID`))
+    FOREIGN KEY (`OrderItemID`)
+    REFERENCES `pos_db`.`orderitem` (`OrderItemID`))
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_0900_ai_ci;
@@ -629,11 +617,7 @@ DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_0900_ai_ci;
 
 
-CREATE TABLE IF NOT EXISTS `pos_db`.`tax` (
-    `TaxID` INT NOT NULL,
-    `TaxName` VARCHAR(50) NOT NULL,
-    `TaxRate` Int NOT NULL,
-    PRIMARY KEY (`TaxID`));
+
 
 
 SET SQL_MODE=@OLD_SQL_MODE;
@@ -648,40 +632,16 @@ INSERT INTO customer(CustomerID, FirstName, LastName, Email, PhoneNumber, Addres
 VALUES(0641, 'SuHyun', 'Lim', 'lsh@cau.co.kr', 01012345678, 'CAU');
 INSERT INTO customer(CustomerID, FirstName, LastName, Email, PhoneNumber, Address)
 VALUES(4372, 'SooMin', 'Bae', 'bsm@cau.ac.kr', 01012345678, 'CAU');
-#INSERT INTO customer(CustomerID, FirstName, LastName, Email, PhoneNumber, Address)
-#VALUES(1973, 'YoHan', 'shin', 'syh@cau.ac.r', 01012345678, 'CAU');
+INSERT INTO customer(CustomerID, FirstName, LastName, Email, PhoneNumber, Address)
+VALUES(6641, 'YoHan', 'shin', 'syh@cau.ac.r', 01012345678, 'CAU');
 
+
+INSERT INTO coupon(CouponID, DiscountPrice) VALUES(0, 0);
 INSERT INTO coupon(CouponID, DiscountPrice) VALUES(1, 1000);
 INSERT INTO coupon(CouponID, DiscountPrice) VALUES(2, 2000);
 INSERT INTO coupon(CouponID, DiscountPrice) VALUES(3, 3000);
 INSERT INTO coupon(CouponID, DiscountPrice) VALUES(4, 4000);
 INSERT INTO coupon(CouponID, DiscountPrice) VALUES(5, 5000);
-
-INSERT INTO customercoupon(customerid, couponid, isused) VALUES(1907, 1, 0);
-INSERT INTO customercoupon(customerid, couponid, isused) VALUES(1907, 2, 0);
-INSERT INTO customercoupon(customerid, couponid, isused) VALUES(1907, 3, 0);
-INSERT INTO customercoupon(customerid, couponid, isused) VALUES(1907, 4, 0);
-INSERT INTO customercoupon(customerid, couponid, isused) VALUES(1907, 5, 0);
-
-INSERT INTO customercoupon(customerid, couponid, isused) VALUES(1973, 1, 0);
-INSERT INTO customercoupon(customerid, couponid, isused) VALUES(1973, 2, 0);
-INSERT INTO customercoupon(customerid, couponid, isused) VALUES(1973, 3, 0);
-INSERT INTO customercoupon(customerid, couponid, isused) VALUES(1973, 4, 0);
-INSERT INTO customercoupon(customerid, couponid, isused) VALUES(1973, 5, 0);
-
-INSERT INTO customercoupon(customerid, couponid, isused) VALUES(0641, 1, 0);
-INSERT INTO customercoupon(customerid, couponid, isused) VALUES(0641, 2, 0);
-INSERT INTO customercoupon(customerid, couponid, isused) VALUES(0641, 3, 0);
-INSERT INTO customercoupon(customerid, couponid, isused) VALUES(0641, 4, 0);
-INSERT INTO customercoupon(customerid, couponid, isused) VALUES(0641, 5, 0);
-
-INSERT INTO customercoupon(customerid, couponid, isused) VALUES(4372, 1, 0);
-INSERT INTO customercoupon(customerid, couponid, isused) VALUES(4372, 2, 0);
-INSERT INTO customercoupon(customerid, couponid, isused) VALUES(4372, 3, 0);
-INSERT INTO customercoupon(customerid, couponid, isused) VALUES(4372, 4, 0);
-INSERT INTO customercoupon(customerid, couponid, isused) VALUES(4372, 5, 0);
-
-
 
 -- 멤버십 레벨 삽입 쿼리
 INSERT INTO `pos_db`.`membershiplevel` (`LevelID`, `LevelName`, `DiscountRate`) VALUES
@@ -689,5 +649,62 @@ INSERT INTO `pos_db`.`membershiplevel` (`LevelID`, `LevelName`, `DiscountRate`) 
 (2, 'Silver', 10.00),
 (3, 'Gold', 15.00);
 
-INSERT INTO pos_db.tax (TaxID, TaxName, TaxRate) VALUES
-(1, '부가가치세', 10);
+
+INSERT INTO membership(LevelID, CustomerID, JoinDate, ExpiryDate, Status) VALUES (3, 1907, 231210,241210, 'active');
+INSERT INTO `pos_db`.`promotion` (`PromotionID`, `PromotionName`, `StartDate`, `EndDate`, `DiscountRate`, `PromotionDescription`) VALUES
+(1, 'BlackFriday', 20231119, 20231122, 30.0, 'BlackFriday Sale!'),
+(2, 'HappyNewYear', 20240101, 20240107, 20.0, 'Happy New Year Sale!');
+
+
+
+
+
+
+DELIMITER //
+CREATE FUNCTION GetDiscountRate(customer_id INT) RETURNS DECIMAL(5,2) READS SQL DATA
+BEGIN
+    DECLARE level_discount DECIMAL(5,2);
+
+    SELECT ml.DiscountRate INTO level_discount
+    FROM membership m
+    JOIN membershiplevel ml ON m.LevelID = ml.LevelID
+    WHERE m.CustomerID = customer_id;
+
+    RETURN COALESCE(level_discount, 0);
+END //
+DELIMITER ;
+
+DELIMITER //
+CREATE FUNCTION ApplyDiscount(customer_id INT, purchase_amount DECIMAL(10,2)) RETURNS DECIMAL(10,2) READS SQL DATA
+BEGIN
+    DECLARE discount_rate DECIMAL(5,2);
+
+    -- 레벨별 할인율 가져오기
+    SET discount_rate = GetDiscountRate(customer_id);
+
+    -- 구매 가격에 할인 적용
+    SET purchase_amount = purchase_amount - (purchase_amount * discount_rate / 100);
+
+    RETURN purchase_amount;
+END //
+DELIMITER ;
+
+DELIMITER //
+
+CREATE TRIGGER update_stock_after_orderitem_insert
+AFTER INSERT ON pos_db.orderitem
+FOR EACH ROW
+BEGIN
+  DECLARE purchased_quantity INT;
+
+  -- Get the purchased quantity from the inserted order item
+  SELECT Quantity INTO purchased_quantity FROM pos_db.orderitem WHERE OrderItemID = NEW.OrderItemID;
+
+  -- Update the stock quantity in the product table
+  UPDATE pos_db.product
+  SET StockQuantity = StockQuantity - purchased_quantity
+  WHERE ProductID = NEW.ProductID;
+END //
+
+DELIMITER ;
+

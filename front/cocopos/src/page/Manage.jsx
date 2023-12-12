@@ -1,9 +1,7 @@
 import TableForm from "../components/TableForm";
-import React, {useState} from "react";
+import React from "react";
 import styled from "styled-components";
 import {Link} from "react-router-dom";
-import AlertModal from "../components/AlertModal";
-
 
 const Wrapper = styled.div`
   margin-top: 70px;
@@ -12,6 +10,7 @@ const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+  
 `
 const BottomBtn = styled.div`
   display: flex;
@@ -43,46 +42,49 @@ const SaleLink = styled(Link)`
 `
 
 
-const ReturnPage = () => {
-    const [askReturnOpen,setAskReturnOpen]=useState(false);
+const Manage=()=>{
     const header = [
         {
-            text: '주문 번호',
-            value: 'Id'
+            text: '카테고리',
+            value: 'category'
         },
         {
-            text: '거래일',
-            value: 'date'
+            text: '상품명',
+            value: 'name'
         },
         {
-            text: '총 금액',
-            value: 'total'
+            text: '가격',
+            value: 'price'
+        },
+        {
+            text: '재고수량',
+            value: 'cnt'
+        },
+        {
+            text: '할인정보',
+            value: 'discountInfo'
         }];
     const item = [{
-        Id: 1,
-            date: '2023-12-25',
-            total: 3000
+        category: '음료',
+        name:'스타벅스 아메리카노',
+        price:'3800',
+        cnt:'30',
+        discountInfo:'10%할인'
     },{
-        Id: 1,
-            date: '2023-12-25',
-            total: 3000
+        category: '음료',
+        name:'스타벅스 아메리카노',
+        price:'3800',
+        cnt:'30',
+        discountInfo:'10%할인'
     }];
-    const headerKey = ['Id', 'date', 'total'];
-    const handleReturn=()=>{
-        setAskReturnOpen(true);
-    }
-    return (
-
+    const headerKey = ['category','name','price','cnt','discountInfo'];
+    return(
         <>
-            <AlertModal isOpen={askReturnOpen} content={"반품 하실 겁니까?"} click={setAskReturnOpen}/>
-
             <Wrapper>
-                최근 거래 내역
+                재고 관리
                 <TableForm header={header} headerKey={headerKey} items={item} selectable={true}/>
                 <p style={{display: 'flex', flexDirection: 'row'}}>
-                    <ReturnBtn onClick={handleReturn}>반품</ReturnBtn>
-                    <BottomBtn><SaleLink to='/'>교환</SaleLink></BottomBtn>
-                    <BottomBtn><SaleLink to='/'>문의내역 조회</SaleLink></BottomBtn>
+                   
                 </p>
 
             </Wrapper>
@@ -90,4 +92,4 @@ const ReturnPage = () => {
     )
 }
 
-export default ReturnPage
+export default Manage;

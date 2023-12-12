@@ -16,6 +16,9 @@ public class MembershipRepositoryImpl implements MembershipRepository {
     private static final String INSERT_MEMBERSHIP_QUERY =
             "INSERT INTO membership (LevelID, CustomerID, JoinDate, ExpiryDate, Status) VALUES (?, ?, ?, ?, ?)";
 
+    private static final String GET_MEMBERSHIP_BY_CUSTOMERID_QUERY =
+            "SELECT * FROM membership WHERE CustomerID=?";
+
     @Override
     public Membership createMembership(Membership membership) {
         jdbcTemplate.update(INSERT_MEMBERSHIP_QUERY,
@@ -27,4 +30,14 @@ public class MembershipRepositoryImpl implements MembershipRepository {
         return membership;
     }
 
+    @Override
+    public Membership getByCustomerId(int customerId) {
+        return jdbcTemplate.queryForObject(GET_MEMBERSHIP_BY_CUSTOMERID_QUERY, (rs, rowNum) -> {
+            return new Membership(rs.getInt("LevelID"),
+                    rs.getInt("CustomerID"),
+                    rs.getString("JoinDate"),
+                    rs.getString("ExpiryDate"),
+                    rs.getString("Status"));
+        }, customerId);
+    }
 }
