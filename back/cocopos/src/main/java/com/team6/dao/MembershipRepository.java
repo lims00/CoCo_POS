@@ -6,4 +6,5 @@ import java.util.List;
 
 public interface MembershipRepository {
     Membership createMembership(Membership membership);
+    Membership getByCustomerId(int customerId);
 }
