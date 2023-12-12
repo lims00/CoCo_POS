@@ -35,6 +35,7 @@ public class CartController {
     @Autowired
     CartItemRepository cartItemRepository;
 
+
     @GetMapping("/customercart/{customerId}")
     public JSONObject customerCart(@PathVariable int customerId) {
         JSONObject json = new JSONObject();
@@ -52,13 +53,7 @@ public class CartController {
         json.put("promotionDesc", promotion.getPromotionDescription());
 
         return json;
-    }
-
-    /*
-    ProductID와 Quantity로 totalprice 및 상품 정보 돌려주는 (상품 번호, 상풍명, 수량, 단가, 가격 ) api
-     */
-
-
+    };
 
     /*
         POST 요청 보낼 때 customerId, productId, quantity를 보내주면,
@@ -77,8 +72,6 @@ public class CartController {
         Cart cart = cartRepository.getCartByCustomerId(customerId);
         cartItemRepository.createCartItem(cart.getCartId(), customerId, quantity);
         cartRepository.UpdateCartTotalPrice(totalProductPrice, cart.getCartId());
-
-
 
         json.put("productId", productId);
         json.put("productName", product.getPrice());

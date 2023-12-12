@@ -16,5 +16,6 @@ public class OrderItem {
     private int productId;
     private int quantity;
     private int unitPrice;
-    private int subtotal;
 }
+
+
