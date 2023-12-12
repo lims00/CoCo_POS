@@ -53,17 +53,18 @@ height: 40px;
   font-size: 30px;
   width: 200px;
 `
-const InputModal=({isOpen,click,setInput,content,moneyResult=()=>{}})=>{
+
+const InputModal=({isOpen,click,setInput,content,moneyResult=()=>{},})=>{
     //이거 모달 닫을 때 보내는 input값? 처럼 쓸 예정인데 걍 필요없는듯,,
     const [inputValue,setInputValue]=useState('')
     const CloseModal = () => {
         if (inputValue!==''){
             click(false);
             moneyResult(true);
+            setInput(inputValue)
         }
     }
     const handleChange=(e)=>{
-        setInput(e.target.value)
         setInputValue(e.target.value)
     }
 
