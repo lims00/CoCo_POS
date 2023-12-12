@@ -9,5 +9,4 @@ public class    CocoposApplication {
     public static void main(String[] args) {
         SpringApplication.run(CocoposApplication.class, args);
     }
-
 }

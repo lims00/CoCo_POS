@@ -625,13 +625,13 @@ SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
 INSERT INTO customer(CustomerID, FirstName, LastName, Email, PhoneNumber, Address)
 VALUES (1907, 'MyeongHoon', 'jang', 'jmh@cau.co.kr', 01012345678, 'CAU');
 INSERT INTO customer(CustomerID, FirstName, LastName, Email, PhoneNumber, Address)
-VALUES(1973, 'JeongWon', 'Na', 'njw@cau.co.kr', 01012345678, 'CAU');
+VALUES (1973, 'JeongWon', 'Na', 'njw@cau.co.kr', 01012345678, 'CAU');
 INSERT INTO customer(CustomerID, FirstName, LastName, Email, PhoneNumber, Address)
-VALUES(0641, 'SuHyun', 'Lim', 'lsh@cau.co.kr', 01012345678, 'CAU');
+VALUES (0641, 'SuHyun', 'Lim', 'lsh@cau.co.kr', 01012345678, 'CAU');
 INSERT INTO customer(CustomerID, FirstName, LastName, Email, PhoneNumber, Address)
-VALUES(4372, 'SooMin', 'Bae', 'bsm@cau.ac.kr', 01012345678, 'CAU');
+VALUES (4372, 'SooMin', 'Bae', 'bsm@cau.ac.kr', 01012345678, 'CAU');
 INSERT INTO customer(CustomerID, FirstName, LastName, Email, PhoneNumber, Address)
-VALUES(6641, 'YoHan', 'shin', 'syh@cau.ac.r', 01012345678, 'CAU');
+VALUES (6641, 'YoHan', 'shin', 'syh@cau.ac.r', 01012345678, 'CAU');
 
 
 INSERT INTO coupon(CouponID, DiscountPrice) VALUES(0, 0);
@@ -648,7 +648,13 @@ INSERT INTO `pos_db`.`membershiplevel` (`LevelID`, `LevelName`, `DiscountRate`) 
 (3, 'Gold', 15.00);
 
 
-INSERT INTO membership(LevelID, CustomerID, JoinDate, ExpiryDate, Status) VALUES (3, 1907, 231210,241210, 'active');
+INSERT INTO membership(LevelID, CustomerID, JoinDate, ExpiryDate, Status) VALUES
+(3, 641, 231210,241210, 'active'),
+(3, 1973, 231210,241210, 'active'),
+(3, 4372, 231210,241210, 'active'),
+(3, 6641, 231210,241210, 'active'),
+(3, 1907, 231210,241210, 'active');
+
 INSERT INTO `pos_db`.`promotion` (`PromotionID`, `PromotionName`, `StartDate`, `EndDate`, `DiscountRate`, `PromotionDescription`) VALUES
 (1, 'BlackFriday', 20231119, 20231122, 30.0, 'BlackFriday Sale!'),
 (2, 'HappyNewYear', 20240101, 20240107, 20.0, 'Happy New Year Sale!');
