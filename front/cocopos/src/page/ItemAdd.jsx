@@ -103,6 +103,7 @@ const ItemAdd = () => {
     const [moneyPayOpen, setMoneyPayOpen]=useState(false);
     const [moneyPayResultOpen,setMoneyPayResultOpen]=useState(false);
     const [moneyInput,setMoneyInput]=useState('');
+    const [paymentOpen,setpaymentOpen]=useState(false);
     const headers =
         [
             {
@@ -162,6 +163,9 @@ const ItemAdd = () => {
         setMoneyPayOpen(true);
     }
 
+    const handlePayment=()=>{
+        setpaymentOpen(true);
+    }
 
     return (
         <Wrapper>
@@ -214,8 +218,11 @@ const ItemAdd = () => {
                         <Price subject={'총 가격'} num={1000}/>
                     </PriceWrapper>
                     <PaymentWrapper>
+                        <button onClick={handlePayment}> 구매하기</button>
+                        <p style={{'display': paymentOpen ? "block" : "none"}}>
                         <PaymentBtn onClick={handleCardPay}>카드 결제</PaymentBtn>
-                        < PaymentBtn onClick={handleMoneyPay}>현금 결제</PaymentBtn>
+                        <PaymentBtn onClick={handleMoneyPay}>현금 결제</PaymentBtn>
+                        </p>
                     </PaymentWrapper>
                     <AlertModal isOpen={cardPayOpen} content={"카드를 삽입해 주세요."} click={setCardPayOpen}/>
                     <InputModal isOpen={moneyPayOpen} content={"받은 금액을 입력해주세요."} click={setMoneyPayOpen} setInput={setMoneyInput} moneyResult={setMoneyPayResultOpen}/>
