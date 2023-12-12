@@ -29,7 +29,7 @@ const ReturnBtn=styled.button`
   align-items: center;
   border-radius: 10px;
   border: 1px solid grey;
-  width: 160px;
+  width: 400px;
   margin: 10px;
   height: 50px;
   font-size: 20px;
@@ -81,7 +81,6 @@ const ReturnPage = () => {
                 <TableForm header={header} headerKey={headerKey} items={item} selectable={true}/>
                 <p style={{display: 'flex', flexDirection: 'row'}}>
                     <ReturnBtn onClick={handleReturn}>반품</ReturnBtn>
-                    <BottomBtn><SaleLink to='/'>교환</SaleLink></BottomBtn>
                     <BottomBtn><SaleLink to='/'>문의내역 조회</SaleLink></BottomBtn>
                 </p>
 
