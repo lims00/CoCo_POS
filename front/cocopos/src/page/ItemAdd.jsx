@@ -242,7 +242,7 @@ const ItemAdd = () => {
                     가격 정보
                     <PriceWrapper>
                         <Price subject={'상품 가격'} num={1000}/>
-                        <Price subject={'부과세(10%)'} num={1000}/>
+                        <Price subject={'부가세(10%)'} num={1000}/>
                         <Price subject={'총 가격'} num={1000}/>
                     </PriceWrapper>
                     <PaymentWrapper>
