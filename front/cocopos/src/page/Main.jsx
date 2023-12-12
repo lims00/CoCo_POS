@@ -90,7 +90,6 @@ const Main = () => {
                 <Detail><SaleLink to='/'>자세히 보기</SaleLink></Detail>
             </SmallBtnWrapper>
         </Wrapper>
-
     )
 }
 

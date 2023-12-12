@@ -55,14 +55,6 @@ public class CartController {
         return json;
     };
 
-
-
-    /*
-    ProductID와 Quantity로 totalprice 및 상품 정보 돌려주는 (상품 번호, 상풍명, 수량, 단가, 가격 ) api
-     */
-
-
-
     /*
         POST 요청 보낼 때 customerId, productId, quantity를 보내주면,
         1.cartItem 생성
