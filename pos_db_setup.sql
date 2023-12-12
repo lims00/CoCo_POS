@@ -66,17 +66,13 @@ COLLATE = utf8mb4_0900_ai_ci;
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `pos_db`.`orders` (
   `OrderID` INT NOT NULL,
-  `CustomerID` INT NULL DEFAULT NULL,
   `PaymentMethodID` INT NOT NULL,
   `CouponID` INT DEFAULT NULL,
   `OrderDate` DATE NULL DEFAULT NULL,
   `DiscountedTotalAmount` INT NOT NULL DEFAULT 0,
   `TotalAmount` DECIMAL(10,2) NULL DEFAULT NULL,
+  `IsReturned` BOOLEAN,
   PRIMARY KEY (`OrderID`),
-  INDEX `CustomerID` (`CustomerID` ASC) VISIBLE,
-  CONSTRAINT `order_ibfk_1`
-    FOREIGN KEY (`CustomerID`)
-    REFERENCES `pos_db`.`customer` (`CustomerID`),
   CONSTRAINT `order_ibfk_2`
     FOREIGN KEY (`PaymentMethodID`)
     REFERENCES `pos_db`.`paymentmethod` (`PaymentMethodID`),
@@ -224,7 +220,6 @@ CREATE TABLE IF NOT EXISTS `pos_db`.`orderitem` (
   `ProductID` INT NULL DEFAULT NULL,
   `Quantity` INT NULL DEFAULT NULL,
   `UnitPrice` DECIMAL(10,2) NULL DEFAULT NULL,
-  `Subtotal` DECIMAL(10,2) NULL DEFAULT NULL,
   PRIMARY KEY (`OrderItemID`),
   INDEX `OrderID` (`OrderID` ASC) VISIBLE,
   INDEX `ProductID` (`ProductID` ASC) VISIBLE,
@@ -483,7 +478,6 @@ CREATE TABLE IF NOT EXISTS `pos_db`.`saleitem` (
   `ProductID` INT NULL DEFAULT NULL,
   `Quantity` INT NULL DEFAULT NULL,
   `UnitPrice` DECIMAL(10,2) NULL DEFAULT NULL,
-  `Subtotal` DECIMAL(10,2) NULL DEFAULT NULL,
   PRIMARY KEY (`SaleItemID`),
   INDEX `SaleID` (`SaleID` ASC) VISIBLE,
   INDEX `ProductID` (`ProductID` ASC) VISIBLE,
@@ -507,7 +501,6 @@ CREATE TABLE IF NOT EXISTS `pos_db`.`returnexchangeitem` (
   `OrderItemID` INT NULL DEFAULT NULL,
   `Quantity` INT NULL DEFAULT NULL,
   `UnitPrice` DECIMAL(10,2) NULL DEFAULT NULL,
-  `Subtotal` DECIMAL(10,2) NULL DEFAULT NULL,
   PRIMARY KEY (`ReturnExchangeItemID`),
   INDEX `ReturnExchangeID` (`ReturnExchangeID` ASC) VISIBLE,
   INDEX `OrderItemID` (`OrderItemID` ASC) VISIBLE,

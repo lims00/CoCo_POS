@@ -16,4 +16,5 @@ public class Orders {
     private String orderDate;
     private int discountedTotalPrice;
     private int totalAmount;
+    private boolean isReturned;
 }
