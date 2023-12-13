@@ -1,5 +1,5 @@
 import TableForm from "../components/TableForm";
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import styled from "styled-components";
 import {Link} from "react-router-dom";
 import AlertModal from "../components/AlertModal";
@@ -58,19 +58,43 @@ const ReturnPage = () => {
             text: '총 금액',
             value: 'total'
         }];
-    const item = [{
+    const [items,setItems] = useState([{
         Id: 1,
             date: '2023-12-25',
             total: 3000
     },{
-        Id: 1,
+        Id: 2,
             date: '2023-12-25',
             total: 3000
-    }];
+    }]);
     const headerKey = ['Id', 'date', 'total'];
     const handleReturn=()=>{
         setAskReturnOpen(true);
     }
+
+    useEffect(()=>{
+        if (askReturnOpen===false && selection.length>0)
+        {
+            selection.map((deleteItem)=>{
+                let indexToDelete=items.findIndex((item)=>item.Id===deleteItem)
+                if (indexToDelete !== -1) {
+                    const newItems = [...items];
+                    newItems.splice(indexToDelete, 1); // splice를 사용하여 해당 요소 삭제
+                    setItems(newItems); // 새로운 배열로 상태 업데이트
+                }
+
+            })
+        }
+    },[askReturnOpen])
+
+
+    const [selection, setSelection] = useState([]);
+
+    useEffect(() => {
+        console.log(selection);
+    }, [selection]);
+
+
     return (
 
         <>
@@ -78,7 +102,7 @@ const ReturnPage = () => {
 
             <Wrapper>
                 최근 거래 내역
-                <TableForm header={header} headerKey={headerKey} items={item} selectable={true}/>
+                <TableForm header={header} headerKey={headerKey} items={items} selectable={true} itemKey={'Id'}  updateSelection={setSelection}/>
                 <p style={{display: 'flex', flexDirection: 'row'}}>
                     <ReturnBtn onClick={handleReturn}>반품</ReturnBtn>
                     <BottomBtn><SaleLink to='/'>문의내역 조회</SaleLink></BottomBtn>

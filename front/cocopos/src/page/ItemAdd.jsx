@@ -91,7 +91,7 @@ const PaymentBtn = styled.div`
   border-radius: 10px;
   border: 1px solid grey;
   margin-left: 10px;
-  margin-top: 20px;
+  margin-top: 0px;
 
 `
 
@@ -104,7 +104,7 @@ const PurchaseBtn = styled.div`
   border-radius: 10px;
   border: 1px solid grey;
   margin-left: 10px;
-  margin-top: 20px;
+  margin-top: 0px;
 `
 const ItemAdd = () => {
 
@@ -118,44 +118,32 @@ const ItemAdd = () => {
     const [moneyPayResultOpen, setMoneyPayResultOpen] = useState(false);
     const [moneyInput, setMoneyInput] = useState('');
     const [paymentOpen, setPaymentOpen] = useState(false);
-    const [customerInfo,setCustomerInfo]=useState('');
+    const [customerInfo, setCustomerInfo] = useState('');
+    const [addedItemSet, setAddedItemSet] = useState([]);
+    const [finalTotalPrice, setFinalTotalPrice] = useState(0);
+    const [canCoupon, setCanCoupon] = useState(false);
     const headers =
         [
             {
                 text: '상품 번호',
-                value: 'Id'
+                value: 'productId'
             },
             {
                 text: '상품명',
-                value: 'name'
+                value: 'productName'
             }, {
             text: '수량',
-            value: 'cnt'
+            value: 'quantity'
         }, {
             text: '단가',
-            value: 'cost'
+            value: 'unitPrice'
         }, {
             text: '가격',
-            value: 'totalCost'
+            value: 'totalProductPrice'
         },
         ];
-    const items = [
-        {
-            id: '1',
-            name: '초코송이',
-            cnt: '2',
-            cost: '1000',
-            totalCost: '2000'
-        }, {
-            id: '1',
-            name: '초코송이',
-            cnt: '2',
-            cost: '1000',
-            totalCost: '2000'
-        }
-    ]
     const headerKey = [
-        'id', 'name', 'cnt', 'cost', 'totalCost'
+        'productId', 'productName', 'quantity', 'unitPrice', 'totalProductPrice'
     ]
     const handleItem = (e) => {
         setSearchItem(e.target.value)
@@ -167,22 +155,37 @@ const ItemAdd = () => {
     }
     const handleAdd = () => {
         console.log(customerId, searchItem, searchCnt)
-        const data={
-            customerId:Number(customerId),
-            productId:Number(searchItem),
-            quantity:Number(searchCnt)
+        const data = {
+            customerId: Number(customerId),
+            productId: Number(searchItem),
+            quantity: Number(searchCnt)
         }
         axios({
-            method:'POST',
-            url:'http://localhost:8080/addtocart',
-            data:data
-        }).then((r)=>{
-            console.log(r)
-        }).catch((e)=>{
-            console.log(e.toString())})
+            method: 'POST',
+            url: 'http://localhost:8080/addtocart',
+            data: data
+        }).then((r) => {
+            let temp_item_data = r.data
+            let temp = {
+                productId: temp_item_data.productId,
+                productName: temp_item_data.productName,
+                quantity: temp_item_data.quantity,
+                unitPrice: temp_item_data.unitPrice,
+                totalProductPrice: temp_item_data.totalProductPrice
+            }
+            let temp_item = addedItemSet
+            temp_item.push(temp)
+            setAddedItemSet(temp_item)
+            console.log(addedItemSet)
+            setFinalTotalPrice(temp_item_data.totalPrice)
+
+        }).catch((e) => {
+            console.log(e.toString())
+        })
 
     }
-
+    useEffect(() => {
+    }, [addedItemSet])
     const handleCardPay = () => {
         setCardPayOpen(true);
 
@@ -194,6 +197,9 @@ const ItemAdd = () => {
 
     const handlePayment = () => {
         setPaymentOpen(true);
+        setCanCoupon(true);
+        //구매하기 axios 넣을 자리
+
     }
 
     useEffect(() => {
@@ -206,11 +212,17 @@ const ItemAdd = () => {
             }).then((response) => {
                 console.log(response.data)
                 setCustomerInfo(response.data)
-            }).catch((e)=>{
+            }).catch((e) => {
                 console.log(e.toString())
             })
         }
     }, [customerId])
+
+    const handleMemberShip = () => {
+        console.log('멤버십 적용')
+        let temp = Number(finalTotalPrice) * (1 - (Number(customerInfo.membershipLevel) * 5) / 100)
+        setFinalTotalPrice(temp)
+    }
 
     return (
         <Wrapper>
@@ -246,11 +258,23 @@ const ItemAdd = () => {
                             상품 추가
                         </SaleBtn>
                     </IdInput>
-                    <TableForm header={headers} items={items} headerKey={headerKey}/>
+                    <TableForm header={headers} items={addedItemSet} headerKey={headerKey}/>
                     <CustomerInfoWrapper>
                         <CustomerInfoBox title={"회원 이름"} content={customerInfo.customerName}/>
-                        <CustomerInfoBox title={"할인 쿠폰"} content={couponId} handleChange={setCoupon} inputBox={true}/>
+                        <CustomerInfoBox title={"할인 쿠폰"} content={couponId} handleChange={setFinalTotalPrice}
+                                         inputBox={true} totalPrice={finalTotalPrice} view={canCoupon}/>
                         <CustomerInfoBox title={"멤버십 Level"} content={customerInfo.membershipLevel}/>
+                        <p style={{border: '1px solid grey', padding: '10px'}}>
+                            상품 구매 방법 안내
+                            <br/>
+                            1. 상품 번호와 수량 입력 후 상품 추가 버튼을 누르면 상품이 추가됩니다.
+                            <br/>
+                            2. 구매하기 버튼을 누르면, 할인 쿠폰을 적용할 수 있습니다.
+                            <br/>
+                            3. 멤버십 할인 적용 버튼을 누르면 멤버십 할인 적용할 수 있습니다.
+                            <br/>
+                            4. 구매하기 버튼 클릭시 카드 결제 또는 현금 결제 창이 나옵니다.
+                        </p>
                     </CustomerInfoWrapper></p>
 
                 <p style={{display: 'flex', flexDirection: 'column', fontSize: '25px', marginLeft: '10px'}}>
@@ -258,10 +282,18 @@ const ItemAdd = () => {
                     <Promotion>{customerInfo.promotionDesc}</Promotion>
                     가격 정보
                     <PriceWrapper>
-                        <Price subject={'상품 가격'} num={1000}/>
-                        <Price subject={'부가세(10%)'} num={1000}/>
-                        <Price subject={'총 가격'} num={1000}/>
+                        <Price subject={'상품 가격'} num={Number(finalTotalPrice) * 0.9}/>
+                        <Price subject={'부가세(10%)'} num={Number(finalTotalPrice) * 0.1}/>
+                        <Price subject={'총 가격'} num={finalTotalPrice}/>
                     </PriceWrapper>
+                    <button onClick={handleMemberShip} style={{
+                        backgroundColor: "white",
+                        marginTop: '20px',
+                        fontSize: '20px',
+                        border: '1px solid grey',
+                        borderRadius: '10px'
+                    }}>멤버십 할인 적용
+                    </button>
                     <PaymentWrapper>
                         <p style={{'display': paymentOpen ? "none" : "block"}}>
                             <PurchaseBtn onClick={handlePayment}> 구매하기</PurchaseBtn></p>
@@ -273,7 +305,7 @@ const ItemAdd = () => {
                     <AlertModal isOpen={cardPayOpen} content={"카드를 삽입해 주세요."} click={setCardPayOpen}/>
                     <InputModal isOpen={moneyPayOpen} content={"받은 금액을 입력해주세요."} click={setMoneyPayOpen}
                                 setInput={setMoneyInput} moneyResult={setMoneyPayResultOpen}/>
-                    <MoneyModal isOpen={moneyPayResultOpen} click={setMoneyPayResultOpen} total={1500}
+                    <MoneyModal isOpen={moneyPayResultOpen} click={setMoneyPayResultOpen} total={finalTotalPrice}
                                 inputMoney={moneyInput}></MoneyModal>
                 </p>
 

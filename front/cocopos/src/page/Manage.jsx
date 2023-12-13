@@ -59,25 +59,19 @@ const Manage=()=>{
         {
             text: '재고수량',
             value: 'cnt'
-        },
-        {
-            text: '할인정보',
-            value: 'discountInfo'
         }];
     const item = [{
         category: '음료',
         name:'스타벅스 아메리카노',
         price:'3800',
-        cnt:'30',
-        discountInfo:'10%할인'
+        cnt:'30'
     },{
         category: '음료',
         name:'스타벅스 아메리카노',
         price:'3800',
-        cnt:'30',
-        discountInfo:'10%할인'
+        cnt:'30'
     }];
-    const headerKey = ['category','name','price','cnt','discountInfo'];
+    const headerKey = ['category','name','price','cnt'];
     return(
         <>
             <Wrapper>

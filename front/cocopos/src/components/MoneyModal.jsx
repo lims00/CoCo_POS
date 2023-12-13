@@ -63,6 +63,7 @@ const MoneyModal=({isOpen,click,setInput,total,inputMoney})=>{
     const returnMoney=inputMoney-total
     const CloseModal=()=>{
         click(false);
+
     }
     return(
         <div style={{'display': isOpen ? "block" : "none"}}>
