@@ -12,6 +12,5 @@ public class Promotion {
     private String promotionName;
     private String startDate;
     private String endDate;
-    private int discountRate;
     private String promotionDescription;
 }
