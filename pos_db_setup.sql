@@ -1,3 +1,4 @@
+DROP DATABASE IF EXISTS `pos_db`;
 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
@@ -65,13 +66,13 @@ COLLATE = utf8mb4_0900_ai_ci;
 -- Table `pos_db`.`orders`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `pos_db`.`orders` (
-  `OrderID` INT NOT NULL,
+  `OrderID` INT  auto_increment NOT NULL,
   `PaymentMethodID` INT NOT NULL,
   `CouponID` INT DEFAULT NULL,
   `OrderDate` DATE NULL DEFAULT NULL,
   `DiscountedTotalAmount` INT NOT NULL DEFAULT 0,
   `TotalAmount` DECIMAL(10,2) NULL DEFAULT NULL,
-  `IsReturned` BOOLEAN,
+  `IsRefunded` BOOLEAN,
   PRIMARY KEY (`OrderID`),
   CONSTRAINT `order_ibfk_2`
     FOREIGN KEY (`PaymentMethodID`)
@@ -129,7 +130,7 @@ COLLATE = utf8mb4_0900_ai_ci;
 -- Table `pos_db`.`product`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `pos_db`.`product` (
-  `ProductID` INT NOT NULL,
+  `ProductID` INT auto_increment NOT NULL,
   `ProductName` VARCHAR(255) NULL DEFAULT NULL,
   `CategoryID` INT NULL DEFAULT NULL,
   `Price` DECIMAL(10,2) NULL DEFAULT NULL,
@@ -192,7 +193,7 @@ COLLATE = utf8mb4_0900_ai_ci;
 -- Table `pos_db`.`membership`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `pos_db`.`membership` (
-  `LevelID` INT NOT NULL,
+  `LevelID` INT auto_increment NOT NULL,
   `CustomerID` INT NOT NULL,
   `JoinDate` DATE NULL DEFAULT NULL,
   `ExpiryDate` DATE NULL DEFAULT NULL,
@@ -215,7 +216,7 @@ COLLATE = utf8mb4_0900_ai_ci;
 -- Table `pos_db`.`orderitem`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `pos_db`.`orderitem` (
-  `OrderItemID` INT NOT NULL,
+  `OrderItemID` INT auto_increment  NOT NULL,
   `OrderID` INT NULL DEFAULT NULL,
   `ProductID` INT NULL DEFAULT NULL,
   `Quantity` INT NULL DEFAULT NULL,
@@ -268,7 +269,7 @@ COLLATE = utf8mb4_0900_ai_ci;
 -- Table `pos_db`.`sale`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `pos_db`.`sale` (
-  `SaleID` INT NOT NULL,
+  `SaleID` INT auto_increment NOT NULL,
   `OrderID` INT NULL DEFAULT NULL,
   `SaleDate` DATE NULL DEFAULT NULL,
   `TotalAmount` DECIMAL(10,2) NULL DEFAULT NULL,
@@ -390,9 +391,9 @@ DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_0900_ai_ci;
 
 CREATE TABLE IF NOT EXISTS `pos_db`.`cartitem` (
-    `CartID` INT NOT NULL,
+    `CartID` INT auto_increment NOT NULL,
     `ProductID` INT NOT NULL,
-    `UnitPrice` INT,
+    `UnitPrice` INT DEFAULT 0,
     `Quantity` INT,
     PRIMARY KEY (`CartID`, `ProductID`),
     CONSTRAINT `cartitem_ibfk_1`
@@ -443,37 +444,36 @@ COLLATE = utf8mb4_0900_ai_ci;
 
 
 -- -----------------------------------------------------
--- Table `pos_db`.`returnexchange`
+-- Table `pos_db`.`refund`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `pos_db`.`returnexchange` (
-  `ReturnExchangeID` INT NOT NULL,
+CREATE TABLE IF NOT EXISTS `pos_db`.`refund` (
+  `RefundID` INT auto_increment NOT NULL,
   `OrderID` INT NULL DEFAULT NULL,
   `CustomerID` INT NULL DEFAULT NULL,
-  `TransactionType` VARCHAR(10) NULL DEFAULT NULL,
-  `TransactionDate` DATE NULL DEFAULT NULL,
   `Status` VARCHAR(50) NULL DEFAULT NULL,
   `Reason` TEXT NULL DEFAULT NULL,
-  `ReturnDate` DATE NULL DEFAULT NULL,
-  `ExchangeDate` DATE NULL DEFAULT NULL,
-  PRIMARY KEY (`ReturnExchangeID`),
+  `RefundDate` DATE NULL DEFAULT NULL, -- Renamed from ReturnDate
+  PRIMARY KEY (`RefundID`),
   INDEX `OrderID` (`OrderID` ASC) VISIBLE,
   INDEX `CustomerID` (`CustomerID` ASC) VISIBLE,
-  CONSTRAINT `returnexchange_ibfk_1`
+  CONSTRAINT `refund_ibfk_1`
     FOREIGN KEY (`OrderID`)
     REFERENCES `pos_db`.`orders` (`OrderID`),
-  CONSTRAINT `returnexchange_ibfk_2`
+  CONSTRAINT `refund_ibfk_2`
     FOREIGN KEY (`CustomerID`)
-    REFERENCES `pos_db`.`customer` (`CustomerID`))
+    REFERENCES `pos_db`.`customer` (`CustomerID`)
+)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_0900_ai_ci;
+
 
 
 -- -----------------------------------------------------
 -- Table `pos_db`.`saleitem`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `pos_db`.`saleitem` (
-  `SaleItemID` INT NOT NULL,
+  `SaleItemID` INT auto_increment NOT NULL,
   `SaleID` INT NULL DEFAULT NULL,
   `ProductID` INT NULL DEFAULT NULL,
   `Quantity` INT NULL DEFAULT NULL,
@@ -491,28 +491,29 @@ ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_0900_ai_ci;
 
-
+-- -------------------
+-- Table `pos_db`.`refunditem`
 -- -----------------------------------------------------
--- Table `pos_db`.`returnexchangeitem`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `pos_db`.`returnexchangeitem` (
-  `ReturnExchangeItemID` INT NOT NULL,
-  `ReturnExchangeID` INT NULL DEFAULT NULL,
+CREATE TABLE IF NOT EXISTS `pos_db`.`refunditem` (
+  `RefundItemID` INT auto_increment NOT NULL,
+  `RefundID` INT NULL DEFAULT NULL,
   `OrderItemID` INT NULL DEFAULT NULL,
   `Quantity` INT NULL DEFAULT NULL,
   `UnitPrice` DECIMAL(10,2) NULL DEFAULT NULL,
-  PRIMARY KEY (`ReturnExchangeItemID`),
-  INDEX `ReturnExchangeID` (`ReturnExchangeID` ASC) VISIBLE,
+  PRIMARY KEY (`RefundItemID`),
+  INDEX `RefundID` (`RefundID` ASC) VISIBLE,
   INDEX `OrderItemID` (`OrderItemID` ASC) VISIBLE,
-  CONSTRAINT `returnexchangeitem_ibfk_1`
-    FOREIGN KEY (`ReturnExchangeID`)
-    REFERENCES `pos_db`.`returnexchange` (`ReturnExchangeID`),
-  CONSTRAINT `returnexchangeitem_ibfk_2`
+  CONSTRAINT `refunditem_ibfk_1`
+    FOREIGN KEY (`RefundID`)
+    REFERENCES `pos_db`.`refund` (`RefundID`),
+  CONSTRAINT `refunditem_ibfk_2`
     FOREIGN KEY (`OrderItemID`)
-    REFERENCES `pos_db`.`orderitem` (`OrderItemID`))
+    REFERENCES `pos_db`.`orderitem` (`OrderItemID`)
+)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_0900_ai_ci;
+
 
 
 -- -----------------------------------------------------
@@ -627,7 +628,7 @@ VALUES (1907, 'MyeongHoon', 'jang', 'jmh@cau.co.kr', 01012345678, 'CAU');
 INSERT INTO customer(CustomerID, FirstName, LastName, Email, PhoneNumber, Address)
 VALUES (1973, 'JeongWon', 'Na', 'njw@cau.co.kr', 01012345678, 'CAU');
 INSERT INTO customer(CustomerID, FirstName, LastName, Email, PhoneNumber, Address)
-VALUES (0641, 'SuHyun', 'Lim', 'lsh@cau.co.kr', 01012345678, 'CAU');
+VALUES (641, 'SuHyun', 'Lim', 'lsh@cau.co.kr', 01012345678, 'CAU');
 INSERT INTO customer(CustomerID, FirstName, LastName, Email, PhoneNumber, Address)
 VALUES (4372, 'SooMin', 'Bae', 'bsm@cau.ac.kr', 01012345678, 'CAU');
 INSERT INTO customer(CustomerID, FirstName, LastName, Email, PhoneNumber, Address)
@@ -647,7 +648,7 @@ INSERT INTO `pos_db`.`membershiplevel` (`LevelID`, `LevelName`, `DiscountRate`) 
 (2, 'Silver', 10.00),
 (3, 'Gold', 15.00);
 
-
+-- 멤버십 삽입 쿼리
 INSERT INTO membership(LevelID, CustomerID, JoinDate, ExpiryDate, Status) VALUES
 (3, 641, 231210,241210, 'active'),
 (3, 1973, 231210,241210, 'active'),
@@ -658,6 +659,56 @@ INSERT INTO membership(LevelID, CustomerID, JoinDate, ExpiryDate, Status) VALUES
 INSERT INTO `pos_db`.`promotion` (`PromotionID`, `PromotionName`, `StartDate`, `EndDate`, `DiscountRate`, `PromotionDescription`) VALUES
 (1, 'BlackFriday', 20231119, 20231122, 30.0, 'BlackFriday Sale!'),
 (2, 'HappyNewYear', 20240101, 20240107, 20.0, 'Happy New Year Sale!');
+
+INSERT INTO category(CategoryID, CategoryName) VALUES
+(1, 'Diary'),
+(2, 'Vegetable'),
+(3, 'Clothes'),
+(4, 'Sneakers'),
+(5, 'Meat');
+
+-- Inserting records into the "product" table with Korean Won (KRW)
+INSERT INTO product(ProductID, ProductName, CategoryID, Price, StockQuantity) VALUES
+(1, 'Milk', 1, 10000, 99),
+(2, 'Sesame', 2, 5000, 100),
+(3, 'Yogurt', 1, 8000, 50),
+(4, 'Carrot', 2, 2000, 200),
+(5, 'T-shirt', 3, 20000, 30),
+(6, 'Running Shoes', 4, 50000, 25),
+(7, 'Chicken Breast', 5, 15000, 80),
+(8, 'Cheese', 1, 12000, 75),
+(9, 'Spinach', 2, 3000, 150),
+(10, 'Jeans', 3, 35000, 40),
+(11, 'Basketball Shoes', 4, 60000, 15),
+(12, 'Beef Steak', 5, 25000, 60);
+
+-- Inserting  payment method
+INSERT INTO paymentmethod(PaymentMethodID, MethodName) VALUES
+(1, 'cash'), (2, 'card');
+
+
+-- Inserting 10 records into the "orders" table
+INSERT INTO orders(OrderID, PaymentMethodID, CouponID, OrderDate, DiscountedTotalAmount, TotalAmount, IsRefunded) VALUES
+(1, 1, NULL, '2023-12-13', 50000, 7000.00, false),
+(2, 2, NULL, '2023-12-14', 25000, 50500.00, false),
+(3, 1, 1, '2023-12-15', 40000, 80000.00, true),
+(4, 2, NULL, '2023-12-16', 75000, 150750.00, false),
+(5, 1, NULL, '2023-12-17', 30000, 60250.00, false),
+(6, 2, NULL, '2023-12-18', 20000, 40200.00, false),
+(7, 1, 2, '2023-12-19', 45000, 90500.00, false),
+(8, 2, NULL, '2023-12-20', 60000, 120600.00, false),
+(9, 1, NULL, '2023-12-21', 35000, 70350.00, false),
+(10, 2, 3, '2023-12-22', 10000, 20100.00, true);
+
+-- Inserting orderitem records for OrderID 1 with values based on the "product" table
+INSERT INTO orderitem(OrderItemID, OrderID, ProductID, Quantity, UnitPrice) VALUES
+(1, 1, 1, 2, 1000),    -- Milk
+(2, 1, 2, 1, 5000);     -- Sesame
+
+
+
+
+
 
 
 
@@ -761,4 +812,79 @@ BEGIN
     SET tax_amount = calculate_tax(total_price);
     RETURN total_price + tax_amount;
 END //
+DELIMITER ;
+
+
+
+
+
+
+USE pos_db; -- 환불 프로시저
+
+DELIMITER //
+
+CREATE PROCEDURE refund(IN p_order_id INT)
+BEGIN
+    DECLARE total_return_amount DECIMAL(10, 2);
+
+    -- Calculate the total return amount for the returned order
+    SELECT SUM(oi.Quantity * oi.UnitPrice) INTO total_return_amount
+    FROM orderitem oi
+    WHERE oi.OrderID = p_order_id;
+
+    -- Add refund information to the refund table
+    INSERT INTO refund (OrderID, refundDate, reason, Status)
+    VALUES (p_order_id, NOW(), 'Just change my mind', 'Processing');
+
+    -- Increase the stock quantity for the returned products
+    UPDATE product p
+    INNER JOIN orderitem oi ON p.ProductID = oi.ProductID
+    SET p.StockQuantity = p.StockQuantity + oi.Quantity
+    WHERE oi.OrderID = p_order_id;
+
+
+   -- Decrease the total order amount in the orders table
+    UPDATE orders
+    SET TotalAmount = TotalAmount - total_return_amount,
+        IsRefunded = true
+    WHERE OrderID = p_order_id;
+
+    SELECT 'Return processed successfully' AS Message;
+END //
+
+DELIMITER ;
+
+
+
+
+
+USE pos_db; -- 거래완료 프로시저
+
+DELIMITER //
+
+CREATE PROCEDURE CompleteTransaction(IN p_order_id INT)
+BEGIN
+    DECLARE v_sale_id INT;
+
+    -- Inserting into `sale` table
+    INSERT INTO sale (OrderID, SaleDate, TotalAmount, PaymentMethodID)
+    SELECT OrderID, OrderDate, TotalAmount, PaymentMethodID
+    FROM orders
+    WHERE OrderID = p_order_id;
+
+    -- Get the generated SaleID
+    SET v_sale_id = LAST_INSERT_ID();
+
+    -- Inserting into `saleitem` table
+    INSERT INTO saleitem (SaleID, ProductID, Quantity, UnitPrice)
+    SELECT v_sale_id, oi.ProductID, oi.Quantity, oi.UnitPrice
+    FROM orderitem oi
+    WHERE oi.OrderID = p_order_id;
+
+    -- Remove the processed orderitem (You can keep the order by commenting or removing this line)
+    -- DELETE FROM orderitem WHERE OrderID = p_order_id;
+
+    SELECT 'Transaction completed successfully' AS Message;
+END //
+
 DELIMITER ;

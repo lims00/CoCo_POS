@@ -2,9 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-
       <module fileurl="file://$PROJECT_DIR$/.idea/DB_TEAM_PROJECT.iml" filepath="$PROJECT_DIR$/.idea/DB_TEAM_PROJECT.iml" />
-
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/cocopos.main.iml" filepath="$PROJECT_DIR$/.idea/modules/cocopos.main.iml" />
     </modules>
   </component>
 </project>
