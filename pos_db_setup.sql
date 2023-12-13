@@ -67,6 +67,7 @@ COLLATE = utf8mb4_0900_ai_ci;
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `pos_db`.`orders` (
   `OrderID` INT  auto_increment NOT NULL,
+  `CustomerID` INT NOT NULL,
   `PaymentMethodID` INT NOT NULL,
   `CouponID` INT DEFAULT NULL,
   `OrderDate` DATE NULL DEFAULT NULL,
@@ -79,7 +80,10 @@ CREATE TABLE IF NOT EXISTS `pos_db`.`orders` (
     REFERENCES `pos_db`.`paymentmethod` (`PaymentMethodID`),
   CONSTRAINT `order_ibfk_3`
     FOREIGN KEY (`CouponID`)
-    REFERENCES `pos_db`.`coupon` (`CouponID`)
+    REFERENCES `pos_db`.`coupon` (`CouponID`),
+  CONSTRAINT `order_ibfk_4`
+    FOREIGN KEY (`CustomerID`)
+    REFERENCES `pos_db`.`customer` (`CustomerID`)
     )
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
@@ -381,7 +385,7 @@ COLLATE = utf8mb4_0900_ai_ci;
 CREATE TABLE IF NOT EXISTS `pos_db`.`cart` (
     `CartID` INT NOT NULL AUTO_INCREMENT,
     `CustomerID` INT NOT NULL,
-    `TotalPrice` INT,
+    `TotalPrice` INT DEFAULT 0,
     PRIMARY KEY (`CartID`),
     CONSTRAINT `cart_ibfk_1`
       FOREIGN KEY (`CustomerID`)
@@ -407,40 +411,51 @@ ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_0900_ai_ci;
 
-
 -- -----------------------------------------------------
--- Table `pos_db`.`report`
+-- Table `pos_db`.`incominginventory`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `pos_db`.`report` (
-  `ReportID` INT NOT NULL,
-  `ReportDate` DATE NULL DEFAULT NULL,
-  `ReportType` VARCHAR(50) NULL DEFAULT NULL,
-  `TotalSalesAmount` DECIMAL(10,2) NULL DEFAULT NULL,
-  `TotalTaxAmount` DECIMAL(10,2) NULL DEFAULT NULL,
-  `TotalDiscountAmount` DECIMAL(10,2) NULL DEFAULT NULL,
-  PRIMARY KEY (`ReportID`))
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8mb4
-COLLATE = utf8mb4_0900_ai_ci;
+DROP TABLE IF EXISTS `incominginventory`;
+CREATE TABLE IF NOT EXISTS `pos_db`.`incominginventory` (
+  `incoming_id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `order_id` INT DEFAULT NULL,
+  `received_date` DATE DEFAULT NULL,
+  `product_id` INT DEFAULT NULL,
+  `quantity_received` INT DEFAULT NULL,
+  PRIMARY KEY (`incoming_id`),
+  UNIQUE KEY `incoming_id` (`incoming_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
 -- -----------------------------------------------------
--- Table `pos_db`.`reportsale`
+-- Table `pos_db`.`inventoryupdate`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `pos_db`.`reportsale` (
-  `ReportID` INT NOT NULL,
-  `SaleID` INT NOT NULL,
-  PRIMARY KEY (`ReportID`, `SaleID`),
-  INDEX `SaleID` (`SaleID` ASC) VISIBLE,
-  CONSTRAINT `reportsale_ibfk_1`
-    FOREIGN KEY (`ReportID`)
-    REFERENCES `pos_db`.`report` (`ReportID`),
-  CONSTRAINT `reportsale_ibfk_2`
-    FOREIGN KEY (`SaleID`)
-    REFERENCES `pos_db`.`sale` (`SaleID`))
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8mb4
-COLLATE = utf8mb4_0900_ai_ci;
+DROP TABLE IF EXISTS `inventoryupdate`;
+CREATE TABLE IF NOT EXISTS `pos_db`.`inventoryupdate` (
+  `update_id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `product_id` INT DEFAULT NULL,
+  `incoming_inventory_id` INT DEFAULT NULL,
+  `quantity_added` INT DEFAULT NULL,
+  `update_date` DATE DEFAULT NULL,
+  PRIMARY KEY (`update_id`),
+  UNIQUE KEY `update_id` (`update_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+
+-- -----------------------------------------------------
+-- Table `pos_db`.`supplier`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `supplier`;
+CREATE TABLE IF NOT EXISTS `pos_db`.`supplier` (
+  `supplier_id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `supplier_name` VARCHAR(255) DEFAULT NULL,
+  `contact_person` VARCHAR(255) DEFAULT NULL,
+  `contact_email` VARCHAR(255) DEFAULT NULL,
+  `contact_phone` VARCHAR(20) DEFAULT NULL,
+  PRIMARY KEY (`supplier_id`),
+  UNIQUE KEY `supplier_id` (`supplier_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 
 
 -- -----------------------------------------------------
@@ -536,22 +551,6 @@ COLLATE = utf8mb4_0900_ai_ci;
 
 
 -- -----------------------------------------------------
--- Table `pos_db`.`salesstatistics`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `pos_db`.`salesstatistics` (
-  `StatisticsID` INT NOT NULL,
-  `StartDate` DATE NULL DEFAULT NULL,
-  `EndDate` DATE NULL DEFAULT NULL,
-  `TotalSalesAmount` DECIMAL(10,2) NULL DEFAULT NULL,
-  `TotalTaxAmount` DECIMAL(10,2) NULL DEFAULT NULL,
-  `TotalDiscountAmount` DECIMAL(10,2) NULL DEFAULT NULL,
-  PRIMARY KEY (`StatisticsID`))
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8mb4
-COLLATE = utf8mb4_0900_ai_ci;
-
-
--- -----------------------------------------------------
 -- Table `pos_db`.`transactionsearch`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `pos_db`.`transactionsearch` (
@@ -578,42 +577,8 @@ DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_0900_ai_ci;
 
 
--- -----------------------------------------------------
--- Table `pos_db`.`searchsale`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `pos_db`.`searchsale` (
-  `TransactionID` INT NOT NULL,
-  `SaleID` INT NOT NULL,
-  PRIMARY KEY (`TransactionID`, `SaleID`),
-  INDEX `SaleID` (`SaleID` ASC) VISIBLE,
-  CONSTRAINT `searchsale_ibfk_1`
-    FOREIGN KEY (`TransactionID`)
-    REFERENCES `pos_db`.`transactionsearch` (`TransactionID`),
-  CONSTRAINT `searchsale_ibfk_2`
-    FOREIGN KEY (`SaleID`)
-    REFERENCES `pos_db`.`sale` (`SaleID`))
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8mb4
-COLLATE = utf8mb4_0900_ai_ci;
 
 
--- -----------------------------------------------------
--- Table `pos_db`.`statisticssale`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `pos_db`.`statisticssale` (
-  `StatisticsID` INT NOT NULL,
-  `SaleID` INT NOT NULL,
-  PRIMARY KEY (`StatisticsID`, `SaleID`),
-  INDEX `SaleID` (`SaleID` ASC) VISIBLE,
-  CONSTRAINT `statisticssale_ibfk_1`
-    FOREIGN KEY (`StatisticsID`)
-    REFERENCES `pos_db`.`salesstatistics` (`StatisticsID`),
-  CONSTRAINT `statisticssale_ibfk_2`
-    FOREIGN KEY (`SaleID`)
-    REFERENCES `pos_db`.`sale` (`SaleID`))
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8mb4
-COLLATE = utf8mb4_0900_ai_ci;
 
 
 
@@ -688,17 +653,17 @@ INSERT INTO paymentmethod(PaymentMethodID, MethodName) VALUES
 
 
 -- Inserting 10 records into the "orders" table
-INSERT INTO orders(OrderID, PaymentMethodID, CouponID, OrderDate, DiscountedTotalAmount, TotalAmount, IsRefunded) VALUES
-(1, 1, NULL, '2023-12-13', 50000, 7000.00, false),
-(2, 2, NULL, '2023-12-14', 25000, 50500.00, false),
-(3, 1, 1, '2023-12-15', 40000, 80000.00, true),
-(4, 2, NULL, '2023-12-16', 75000, 150750.00, false),
-(5, 1, NULL, '2023-12-17', 30000, 60250.00, false),
-(6, 2, NULL, '2023-12-18', 20000, 40200.00, false),
-(7, 1, 2, '2023-12-19', 45000, 90500.00, false),
-(8, 2, NULL, '2023-12-20', 60000, 120600.00, false),
-(9, 1, NULL, '2023-12-21', 35000, 70350.00, false),
-(10, 2, 3, '2023-12-22', 10000, 20100.00, true);
+INSERT INTO orders(OrderID, CustomerID, PaymentMethodID, CouponID, OrderDate, DiscountedTotalAmount, TotalAmount, IsRefunded) VALUES
+(1,1907, 1, NULL, '2023-12-13', 50000, 7000.00, false),
+(2, 1907,2, NULL, '2023-12-14', 25000, 50500.00, false),
+(3,1907, 1, 1, '2023-12-15', 40000, 80000.00, true),
+(4,1907, 2, NULL, '2023-12-16', 75000, 150750.00, false),
+(5,1907, 1, NULL, '2023-12-17', 30000, 60250.00, false),
+(6,1907, 2, NULL, '2023-12-18', 20000, 40200.00, false),
+(7,1907, 1, 2, '2023-12-19', 45000, 90500.00, false),
+(8,1907, 2, NULL, '2023-12-20', 60000, 120600.00, false),
+(9, 1907,1, NULL, '2023-12-21', 35000, 70350.00, false),
+(10,1907, 2, 3, '2023-12-22', 10000, 20100.00, true);
 
 -- Inserting orderitem records for OrderID 1 with values based on the "product" table
 INSERT INTO orderitem(OrderItemID, OrderID, ProductID, Quantity, UnitPrice) VALUES
@@ -882,16 +847,31 @@ BEGIN
     -- Get the generated SaleID
     SET v_sale_id = LAST_INSERT_ID();
 
-    — Inserting into `saleitem` table
+    -- Inserting into `saleitem` table
     INSERT INTO saleitem (SaleID, ProductID, Quantity, UnitPrice)
     SELECT v_sale_id, oi.ProductID, oi.Quantity, oi.UnitPrice
     FROM orderitem oi
     WHERE oi.OrderID = p_order_id;
 
-    — Remove the processed orderitem (You can keep the order by commenting or removing this line)
-    — DELETE FROM orderitem WHERE OrderID = p_order_id;
+    -- Remove the processed orderitem (You can keep the order by commenting or removing this line)
+   DELETE FROM orderitem WHERE OrderID = p_order_id;
 
     SELECT 'Transaction completed successfully' AS Message;
+END //
+
+DELIMITER ;
+
+
+DELIMITER //
+
+CREATE PROCEDURE GetOrdersByDateRange(
+  IN startDate DATE,
+  IN endDate DATE
+)
+BEGIN
+  SELECT *
+  FROM pos_db.orders
+  WHERE OrderDate BETWEEN startDate AND endDate;
 END //
 
 DELIMITER ;

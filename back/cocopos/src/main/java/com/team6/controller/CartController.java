@@ -79,40 +79,4 @@ public class CartController {
                 totalProductPrice,
                 cartRepository.UpdateCartTotalPrice(cart.getCartId(), totalProductPrice));
     }
-
-//    @PostMapping("/addtocart")
-//    public ResponseEntity<?> addToCartByIdAndQuantity(@RequestBody AddToCartInput addtocartinput) {
-//        // 생략: 예외 처리 및 Repository 메서드 호출 등
-//
-//        Product product = productRepository.getById(addtocartinput.getProductId());
-//
-//        if (product == null) {
-//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Product not found");
-//        }
-//
-//        int unitPrice = product.getPrice();
-//        int totalProductPrice = unitPrice * addtocartinput.getQunatity();
-//
-//        Cart cart = cartRepository.getCartByCustomerId(addtocartinput.getCustomerId());
-//        cartItemRepository.createCartItem(cart.getCartId(), addtocartinput.getProductId(), addtocartinput.getQunatity());
-//        cartRepository.UpdateCartTotalPrice(totalProductPrice, cart.getCartId());
-//
-//        Map<String, Object> response = new HashMap<>();
-//        response.put("productId", addtocartinput.getCustomerId());
-//        response.put("productName", product.getProductName()); // 이름으로 수정
-//        response.put("quantity", addtocartinput.getCustomerId());
-//        response.put("unitPrice", unitPrice);
-//        response.put("totalProductPrice", totalProductPrice);
-//        response.put("totalPrice", cart.getTotalPrice());
-//
-//        return ResponseEntity.ok(response);
-//    }
-
-
-    /* 할인 쿠폰 입력하면 가격 계산...(이건 그냥 front에서 처리해도 될듯) */
-    /* 최근 거래 내역(주문번호,거래일, 총금액) d알려주는 api */
-
-
-    /* 반품도 (최근 거래 내역과 동일한 정보 필요) 반품할 물건 알려주는 api */
-
 }
