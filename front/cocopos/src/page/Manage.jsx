@@ -71,6 +71,8 @@ const Manage=()=>{
         price:'3800',
         cnt:'30'
     }];
+
+
     const headerKey = ['category','name','price','cnt'];
     return(
         <>
