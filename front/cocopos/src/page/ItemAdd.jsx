@@ -118,6 +118,7 @@ const ItemAdd = () => {
     const [moneyPayResultOpen, setMoneyPayResultOpen] = useState(false);
     const [moneyInput, setMoneyInput] = useState('');
     const [paymentOpen, setPaymentOpen] = useState(false);
+    const [customerInfo,setCustomerInfo]=useState('');
     const headers =
         [
             {
@@ -165,6 +166,20 @@ const ItemAdd = () => {
         console.log(searchCnt)
     }
     const handleAdd = () => {
+        console.log(customerId, searchItem, searchCnt)
+        const data={
+            customerId:Number(customerId),
+            productId:Number(searchItem),
+            quantity:Number(searchCnt)
+        }
+        axios({
+            method:'POST',
+            url:'http://localhost:8080/addtocart',
+            data:data
+        }).then((r)=>{
+            console.log(r)
+        }).catch((e)=>{
+            console.log(e.toString())})
 
     }
 
@@ -189,7 +204,8 @@ const ItemAdd = () => {
                 url: `http://localhost:8080/customercart/${customerId}`,
 
             }).then((response) => {
-                console.log(response)
+                console.log(response.data)
+                setCustomerInfo(response.data)
             }).catch((e)=>{
                 console.log(e.toString())
             })
@@ -232,13 +248,14 @@ const ItemAdd = () => {
                     </IdInput>
                     <TableForm header={headers} items={items} headerKey={headerKey}/>
                     <CustomerInfoWrapper>
-                        <CustomerInfoBox title={"회원 아이디"} content={customerId}/>
+                        <CustomerInfoBox title={"회원 이름"} content={customerInfo.customerName}/>
                         <CustomerInfoBox title={"할인 쿠폰"} content={couponId} handleChange={setCoupon} inputBox={true}/>
-                        <CustomerInfoBox title={"멤버십"} content={customerId}/>
+                        <CustomerInfoBox title={"멤버십 Level"} content={customerInfo.membershipLevel}/>
                     </CustomerInfoWrapper></p>
 
-                <p style={{display: 'flex', flexDirection: 'column', fontSize: '25px', marginLeft: '10px'}}>프로모션 정보
-                    <Promotion></Promotion>
+                <p style={{display: 'flex', flexDirection: 'column', fontSize: '25px', marginLeft: '10px'}}>
+                    프로모션 정보
+                    <Promotion>{customerInfo.promotionDesc}</Promotion>
                     가격 정보
                     <PriceWrapper>
                         <Price subject={'상품 가격'} num={1000}/>

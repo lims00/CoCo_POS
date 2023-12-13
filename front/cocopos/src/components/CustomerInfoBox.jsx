@@ -4,7 +4,7 @@ import styled from "styled-components";
 const Title = styled.div`
   display: flex;
   height: 50px;
-  width: 110px;
+  width: 150px;
   justify-content: flex-start;
   align-items: center;
   font-size: 20px;
@@ -12,7 +12,7 @@ const Title = styled.div`
 `
 const InputBox = styled.input`
   display: flex;
-  margin-left: 30px;
+  margin-left: 10px;
   padding-left: 10px;
   margin-right: 20px;
   border: 1px solid grey;
@@ -23,7 +23,7 @@ const InputBox = styled.input`
 `
 
 const ContentBox = styled.div`
-  margin-left: 30px;
+  margin-left: 10px;
   padding-left: 10px;
   border: 1px solid grey;
   width: 300px;
