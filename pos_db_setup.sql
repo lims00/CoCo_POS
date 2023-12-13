@@ -67,7 +67,6 @@ COLLATE = utf8mb4_0900_ai_ci;
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `pos_db`.`orders` (
   `OrderID` INT  auto_increment NOT NULL,
-  `CustomerID` INT NOT NULL,
   `PaymentMethodID` INT NOT NULL,
   `CouponID` INT DEFAULT NULL,
   `OrderDate` DATE NULL DEFAULT NULL,
@@ -80,10 +79,7 @@ CREATE TABLE IF NOT EXISTS `pos_db`.`orders` (
     REFERENCES `pos_db`.`paymentmethod` (`PaymentMethodID`),
   CONSTRAINT `order_ibfk_3`
     FOREIGN KEY (`CouponID`)
-    REFERENCES `pos_db`.`coupon` (`CouponID`),
-  CONSTRAINT `order_ibfk_4`
-    FOREIGN KEY (`CustomerID`)
-    REFERENCES `pos_db`.`customer` (`CustomerID`)
+    REFERENCES `pos_db`.`coupon` (`CouponID`)
     )
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
@@ -385,7 +381,7 @@ COLLATE = utf8mb4_0900_ai_ci;
 CREATE TABLE IF NOT EXISTS `pos_db`.`cart` (
     `CartID` INT NOT NULL AUTO_INCREMENT,
     `CustomerID` INT NOT NULL,
-    `TotalPrice` INT DEFAULT 0,
+    `TotalPrice` INT,
     PRIMARY KEY (`CartID`),
     CONSTRAINT `cart_ibfk_1`
       FOREIGN KEY (`CustomerID`)
@@ -416,13 +412,13 @@ COLLATE = utf8mb4_0900_ai_ci;
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `incominginventory`;
 CREATE TABLE IF NOT EXISTS `pos_db`.`incominginventory` (
-  `incoming_id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `order_id` INT DEFAULT NULL,
-  `received_date` DATE DEFAULT NULL,
-  `product_id` INT DEFAULT NULL,
-  `quantity_received` INT DEFAULT NULL,
-  PRIMARY KEY (`incoming_id`),
-  UNIQUE KEY `incoming_id` (`incoming_id`)
+  `IncomingId` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `OrderId` INT DEFAULT NULL,
+  `ReceivedDate` DATE DEFAULT NULL,
+  `ProductId` INT DEFAULT NULL,
+  `QuantityReceived` INT DEFAULT NULL,
+  PRIMARY KEY (`IncomingId`),
+  UNIQUE KEY `IncomingId` (`IncomingId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
@@ -431,15 +427,32 @@ CREATE TABLE IF NOT EXISTS `pos_db`.`incominginventory` (
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `inventoryupdate`;
 CREATE TABLE IF NOT EXISTS `pos_db`.`inventoryupdate` (
-  `update_id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `product_id` INT DEFAULT NULL,
-  `incoming_inventory_id` INT DEFAULT NULL,
-  `quantity_added` INT DEFAULT NULL,
-  `update_date` DATE DEFAULT NULL,
-  PRIMARY KEY (`update_id`),
-  UNIQUE KEY `update_id` (`update_id`)
+  `UpdateId` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `ProductId` INT DEFAULT NULL,
+  `IncomingInventoryId` INT DEFAULT NULL,
+  `QuantityAdded` INT DEFAULT NULL,
+  `UpdateDate` DATE DEFAULT NULL,
+  PRIMARY KEY (`UpdateId`),
+  UNIQUE KEY `UpdateId` (`UpdateId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+
+-- -----------------------------------------------------
+-- Table `pos_db`.`promotioncoupons`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `promotioncoupons`;
+CREATE TABLE IF NOT EXISTS `pos_db`.`promotioncoupons` (
+  `CouponId` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `CouponCode` VARCHAR(20) DEFAULT NULL,
+  `DiscountPercent` DECIMAL(5,2) DEFAULT NULL,
+  `DiscountAmount` INT DEFAULT NULL,
+  `ExpirationDate` DATE DEFAULT NULL,
+  `PromotionId` BIGINT UNSIGNED NOT NULL,
+  PRIMARY KEY (`CouponId`),
+  UNIQUE KEY `CouponId` (`CouponId`),
+  KEY `PromotionId` (`PromotionId`),
+  CONSTRAINT `PromotionCoupons_ibfk_1` FOREIGN KEY (`PromotionId`) REFERENCES `promotion` (`PromotionId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
 -- -----------------------------------------------------
@@ -447,13 +460,13 @@ CREATE TABLE IF NOT EXISTS `pos_db`.`inventoryupdate` (
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `supplier`;
 CREATE TABLE IF NOT EXISTS `pos_db`.`supplier` (
-  `supplier_id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `supplier_name` VARCHAR(255) DEFAULT NULL,
-  `contact_person` VARCHAR(255) DEFAULT NULL,
-  `contact_email` VARCHAR(255) DEFAULT NULL,
-  `contact_phone` VARCHAR(20) DEFAULT NULL,
-  PRIMARY KEY (`supplier_id`),
-  UNIQUE KEY `supplier_id` (`supplier_id`)
+  `SupplierId` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `SupplierName` VARCHAR(255) DEFAULT NULL,
+  `ContactPerson` VARCHAR(255) DEFAULT NULL,
+  `ContactEmail` VARCHAR(255) DEFAULT NULL,
+  `ContactPhone` VARCHAR(20) DEFAULT NULL,
+  PRIMARY KEY (`SupplierId`),
+  UNIQUE KEY `SupplierId` (`SupplierId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
@@ -653,17 +666,17 @@ INSERT INTO paymentmethod(PaymentMethodID, MethodName) VALUES
 
 
 -- Inserting 10 records into the "orders" table
-INSERT INTO orders(OrderID, CustomerID, PaymentMethodID, CouponID, OrderDate, DiscountedTotalAmount, TotalAmount, IsRefunded) VALUES
-(1,1907, 1, NULL, '2023-12-13', 50000, 7000.00, false),
-(2, 1907,2, NULL, '2023-12-14', 25000, 50500.00, false),
-(3,1907, 1, 1, '2023-12-15', 40000, 80000.00, true),
-(4,1907, 2, NULL, '2023-12-16', 75000, 150750.00, false),
-(5,1907, 1, NULL, '2023-12-17', 30000, 60250.00, false),
-(6,1907, 2, NULL, '2023-12-18', 20000, 40200.00, false),
-(7,1907, 1, 2, '2023-12-19', 45000, 90500.00, false),
-(8,1907, 2, NULL, '2023-12-20', 60000, 120600.00, false),
-(9, 1907,1, NULL, '2023-12-21', 35000, 70350.00, false),
-(10,1907, 2, 3, '2023-12-22', 10000, 20100.00, true);
+INSERT INTO orders(OrderID, PaymentMethodID, CouponID, OrderDate, DiscountedTotalAmount, TotalAmount, IsRefunded) VALUES
+(1, 1, NULL, '2023-12-13', 50000, 7000.00, false),
+(2, 2, NULL, '2023-12-14', 25000, 50500.00, false),
+(3, 1, 1, '2023-12-15', 40000, 80000.00, true),
+(4, 2, NULL, '2023-12-16', 75000, 150750.00, false),
+(5, 1, NULL, '2023-12-17', 30000, 60250.00, false),
+(6, 2, NULL, '2023-12-18', 20000, 40200.00, false),
+(7, 1, 2, '2023-12-19', 45000, 90500.00, false),
+(8, 2, NULL, '2023-12-20', 60000, 120600.00, false),
+(9, 1, NULL, '2023-12-21', 35000, 70350.00, false),
+(10, 2, 3, '2023-12-22', 10000, 20100.00, true);
 
 -- Inserting orderitem records for OrderID 1 with values based on the "product" table
 INSERT INTO orderitem(OrderItemID, OrderID, ProductID, Quantity, UnitPrice) VALUES
