@@ -66,6 +66,7 @@ public class CartController {
         Product product = productRepository.getById(addtocartinput.getProductId());
         int unitPrice = product.getPrice();
         int totalProductPrice = unitPrice * addtocartinput.getQuantity();
+
         Cart cart = cartRepository.getCartByCustomerId(addtocartinput.getCustomerId());
         cartItemRepository.createCartItem(cart.getCartId(), addtocartinput.getProductId(), addtocartinput.getQuantity());
 
