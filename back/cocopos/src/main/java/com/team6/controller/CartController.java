@@ -1,14 +1,12 @@
 package com.team6.controller;
 
-import com.google.gson.Gson;
 import com.team6.dao.*;
+import com.team6.dto.AddToCartInput;
+import com.team6.dto.AddToCartOutput;
 import com.team6.entity.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-
-import java.util.List;
 
 
 @RestController
@@ -64,23 +62,51 @@ public class CartController {
         위에서 totalPrice는 해당 물건 가격 * 총 갯수, totalPrice는 카트에 담긴 모든 물건들의 가격 전부 합친 것
      */
     @PostMapping("/addtocart")
-    public JSONObject addToCartByIdAndQuantity(int customerId, int productId, int quantity) {
-        JSONObject json = new JSONObject(); // Json Object 생성
-        Product product = productRepository.getById(productId);
+    public AddToCartOutput addToCartByIdAndQuantity(@RequestBody AddToCartInput addtocartinput) {
+        Product product = productRepository.getById(addtocartinput.getProductId());
         int unitPrice = product.getPrice();
-        int totalProductPrice = unitPrice * quantity;
-        Cart cart = cartRepository.getCartByCustomerId(customerId);
-        cartItemRepository.createCartItem(cart.getCartId(), customerId, quantity);
-        cartRepository.UpdateCartTotalPrice(totalProductPrice, cart.getCartId());
+        int totalProductPrice = unitPrice * addtocartinput.getQuantity();
+        Cart cart = cartRepository.getCartByCustomerId(addtocartinput.getCustomerId());
+        cartItemRepository.createCartItem(cart.getCartId(), addtocartinput.getProductId(), addtocartinput.getQuantity());
 
-        json.put("productId", productId);
-        json.put("productName", product.getPrice());
-        json.put("quantity", quantity);
-        json.put("unitPrice", unitPrice);
-        json.put("totalProductPrice", totalProductPrice);
-        json.put("totalPrice", cart.getTotalPrice()); // Cart 안에 담겨있는 전체 물건 가격
-        return json;
+
+        return new AddToCartOutput(
+                product.getProductId(),
+                product.getProductName(),
+                addtocartinput.getQuantity(),
+                unitPrice,
+                totalProductPrice,
+                cartRepository.UpdateCartTotalPrice(cart.getCartId(), totalProductPrice));
     }
+
+//    @PostMapping("/addtocart")
+//    public ResponseEntity<?> addToCartByIdAndQuantity(@RequestBody AddToCartInput addtocartinput) {
+//        // 생략: 예외 처리 및 Repository 메서드 호출 등
+//
+//        Product product = productRepository.getById(addtocartinput.getProductId());
+//
+//        if (product == null) {
+//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Product not found");
+//        }
+//
+//        int unitPrice = product.getPrice();
+//        int totalProductPrice = unitPrice * addtocartinput.getQunatity();
+//
+//        Cart cart = cartRepository.getCartByCustomerId(addtocartinput.getCustomerId());
+//        cartItemRepository.createCartItem(cart.getCartId(), addtocartinput.getProductId(), addtocartinput.getQunatity());
+//        cartRepository.UpdateCartTotalPrice(totalProductPrice, cart.getCartId());
+//
+//        Map<String, Object> response = new HashMap<>();
+//        response.put("productId", addtocartinput.getCustomerId());
+//        response.put("productName", product.getProductName()); // 이름으로 수정
+//        response.put("quantity", addtocartinput.getCustomerId());
+//        response.put("unitPrice", unitPrice);
+//        response.put("totalProductPrice", totalProductPrice);
+//        response.put("totalPrice", cart.getTotalPrice());
+//
+//        return ResponseEntity.ok(response);
+//    }
+
 
     /* 할인 쿠폰 입력하면 가격 계산...(이건 그냥 front에서 처리해도 될듯) */
     /* 최근 거래 내역(주문번호,거래일, 총금액) d알려주는 api */

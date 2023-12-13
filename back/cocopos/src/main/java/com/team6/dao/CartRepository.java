@@ -10,4 +10,5 @@ public interface CartRepository {
     Cart getCartByCustomerId(int customerId);
 
     int UpdateCartTotalPrice(int cartId, int addPrice);
+
 }
