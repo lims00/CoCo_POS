@@ -67,6 +67,7 @@ COLLATE = utf8mb4_0900_ai_ci;
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `pos_db`.`orders` (
   `OrderID` INT  auto_increment NOT NULL,
+  `CustomerID` INT NOT NULL,
   `PaymentMethodID` INT NOT NULL,
   `CouponID` INT DEFAULT NULL,
   `OrderDate` DATE NULL DEFAULT NULL,
@@ -79,7 +80,10 @@ CREATE TABLE IF NOT EXISTS `pos_db`.`orders` (
     REFERENCES `pos_db`.`paymentmethod` (`PaymentMethodID`),
   CONSTRAINT `order_ibfk_3`
     FOREIGN KEY (`CouponID`)
-    REFERENCES `pos_db`.`coupon` (`CouponID`)
+    REFERENCES `pos_db`.`coupon` (`CouponID`),
+  CONSTRAINT `order_ibfk_4`
+    FOREIGN KEY (`CustomerID`)
+    REFERENCES `pos_db`.`customer` (`CustomerID`)
     )
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
@@ -116,14 +120,24 @@ COLLATE = utf8mb4_0900_ai_ci;
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `pos_db`.`employee` (
   `EmployeeID` INT NOT NULL,
+  `PositionID` INT NOT NULL,
+  `DepartmentID` INT NOT NULL,
   `FirstName` VARCHAR(255) NULL DEFAULT NULL,
   `LastName` VARCHAR(255) NULL DEFAULT NULL,
-  `Position` VARCHAR(50) NULL DEFAULT NULL,
-  `Department` VARCHAR(50) NULL DEFAULT NULL,
-  PRIMARY KEY (`EmployeeID`))
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8mb4
-COLLATE = utf8mb4_0900_ai_ci;
+  PRIMARY KEY (`EmployeeID`),
+  CONSTRAINT `employee_ibfk1`
+    FOREIGN KEY (`PositionID`)
+    REFERENCES `pos_db`.`position` (`PositionID`),
+  CONSTRAINT `employee_ibfk2`
+    FOREIGN KEY (`DepartmentID`)
+    REFERENCES `pos_db`.`department` (`DepartmentID`)
+                                               );
+
+CREATE TABLE IF NOT EXISTS `pos_db`.`department` (
+  `DepartmentID` INT NOT NULL,
+  `DepartmentName` VARCHAR(50) NOT NULL,
+  `DepartmentDescription` VARCHAR(255) NOT NULL,
+  PRIMARY KEY (`DepartmentID`));
 
 
 -- -----------------------------------------------------
@@ -148,7 +162,7 @@ COLLATE = utf8mb4_0900_ai_ci;
 -- -----------------------------------------------------
 -- Table `pos_db`.`productinquiry`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `pos_db`.`productinquiry` (
+CREATE TABLE IF NOT EXISTS `pos_db`.`inquiry` (
   `InquiryID` INT NOT NULL,
   `ProductID` INT NULL DEFAULT NULL,
   `CustomerID` INT NULL DEFAULT NULL,
@@ -180,13 +194,20 @@ CREATE TABLE IF NOT EXISTS `pos_db`.`inquiryreply` (
   INDEX `EmployeeID` (`EmployeeID` ASC) VISIBLE,
   CONSTRAINT `inquiryreply_ibfk_1`
     FOREIGN KEY (`InquiryID`)
-    REFERENCES `pos_db`.`productinquiry` (`InquiryID`),
+    REFERENCES `pos_db`.`inquiry` (`InquiryID`),
   CONSTRAINT `inquiryreply_ibfk_2`
     FOREIGN KEY (`EmployeeID`)
     REFERENCES `pos_db`.`employee` (`EmployeeID`))
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_0900_ai_ci;
+
+CREATE TABLE IF NOT EXISTS `pos_db`.`position` (
+    `PositionID` INT NOT NULL,
+    `PositionName` VARCHAR(50) NOT NULL,
+    `PositionDescription` VARCHAR(50) NOT NULL,
+    PRIMARY KEY (`PositionID`)
+);
 
 
 -- -----------------------------------------------------
@@ -256,7 +277,6 @@ CREATE TABLE IF NOT EXISTS `pos_db`.`promotion` (
   `PromotionName` VARCHAR(255) NULL DEFAULT NULL,
   `StartDate` DATE NULL DEFAULT NULL,
   `EndDate` DATE NULL DEFAULT NULL,
-  `DiscountRate` DECIMAL(5,2) NULL DEFAULT NULL,
   `PromotionDescription` TEXT NULL DEFAULT NULL,
   PRIMARY KEY (`PromotionID`))
 ENGINE = InnoDB
@@ -381,7 +401,7 @@ COLLATE = utf8mb4_0900_ai_ci;
 CREATE TABLE IF NOT EXISTS `pos_db`.`cart` (
     `CartID` INT NOT NULL AUTO_INCREMENT,
     `CustomerID` INT NOT NULL,
-    `TotalPrice` INT,
+    `TotalPrice` INT DEFAULT 0,
     PRIMARY KEY (`CartID`),
     CONSTRAINT `cart_ibfk_1`
       FOREIGN KEY (`CustomerID`)
@@ -408,51 +428,25 @@ DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_0900_ai_ci;
 
 -- -----------------------------------------------------
--- Table `pos_db`.`incominginventory`
+-- Table `pos_db`.`supplyorder`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `incominginventory`;
-CREATE TABLE IF NOT EXISTS `pos_db`.`incominginventory` (
-  `IncomingId` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `OrderId` INT DEFAULT NULL,
-  `ReceivedDate` DATE DEFAULT NULL,
-  `ProductId` INT DEFAULT NULL,
-  `QuantityReceived` INT DEFAULT NULL,
-  PRIMARY KEY (`IncomingId`),
-  UNIQUE KEY `IncomingId` (`IncomingId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+DROP TABLE IF EXISTS `supplyorder`;
+CREATE TABLE IF NOT EXISTS `pos_db`.`supplyorder` (
+  `SupplyOrderID` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `SupplyOrderDate` DATE DEFAULT NULL,
+  `ProductID` INT DEFAULT NULL,
+  `Quantity` INT DEFAULT NULL,
+  `SupplierID` BIGINT UNSIGNED NOT NULL,
+  PRIMARY KEY (`SupplyorderID`),
+  UNIQUE KEY `SupplyOrderID` (`SupplyOrderID`),
+  CONSTRAINT `supplyorder_ibfk_1`
+      FOREIGN KEY (`ProductID`)
+      REFERENCES `pos_db`.`product` (`ProductID`),
+  CONSTRAINT `supplyorder_ibfk_2`
+      FOREIGN KEY (`SupplierID`)
+      REFERENCES `pos_db`.`supplier` (`SupplierID`))
+ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-
--- -----------------------------------------------------
--- Table `pos_db`.`inventoryupdate`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `inventoryupdate`;
-CREATE TABLE IF NOT EXISTS `pos_db`.`inventoryupdate` (
-  `UpdateId` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `ProductId` INT DEFAULT NULL,
-  `IncomingInventoryId` INT DEFAULT NULL,
-  `QuantityAdded` INT DEFAULT NULL,
-  `UpdateDate` DATE DEFAULT NULL,
-  PRIMARY KEY (`UpdateId`),
-  UNIQUE KEY `UpdateId` (`UpdateId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
-
--- -----------------------------------------------------
--- Table `pos_db`.`promotioncoupons`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `promotioncoupons`;
-CREATE TABLE IF NOT EXISTS `pos_db`.`promotioncoupons` (
-  `CouponId` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `CouponCode` VARCHAR(20) DEFAULT NULL,
-  `DiscountPercent` DECIMAL(5,2) DEFAULT NULL,
-  `DiscountAmount` INT DEFAULT NULL,
-  `ExpirationDate` DATE DEFAULT NULL,
-  `PromotionId` BIGINT UNSIGNED NOT NULL,
-  PRIMARY KEY (`CouponId`),
-  UNIQUE KEY `CouponId` (`CouponId`),
-  KEY `PromotionId` (`PromotionId`),
-  CONSTRAINT `PromotionCoupons_ibfk_1` FOREIGN KEY (`PromotionId`) REFERENCES `promotion` (`PromotionId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
 -- -----------------------------------------------------
@@ -460,13 +454,12 @@ CREATE TABLE IF NOT EXISTS `pos_db`.`promotioncoupons` (
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `supplier`;
 CREATE TABLE IF NOT EXISTS `pos_db`.`supplier` (
-  `SupplierId` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `SupplierID` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   `SupplierName` VARCHAR(255) DEFAULT NULL,
-  `ContactPerson` VARCHAR(255) DEFAULT NULL,
   `ContactEmail` VARCHAR(255) DEFAULT NULL,
   `ContactPhone` VARCHAR(20) DEFAULT NULL,
-  PRIMARY KEY (`SupplierId`),
-  UNIQUE KEY `SupplierId` (`SupplierId`)
+  PRIMARY KEY (`SupplierID`),
+  UNIQUE KEY `SupplierID` (`SupplierID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
@@ -562,33 +555,25 @@ ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_0900_ai_ci;
 
+CREATE TABLE IF NOT EXISTS `pos_db`.`authority` (
+    `AuthorityID` INT NOT NULL,
+    `AuthorityName` VARCHAR(50) NOT NULL,
+    `AuthorityDescription` VARCHAR(200) NOT NULL,
+    PRIMARY KEY (`AuthorityID`)
+);
 
--- -----------------------------------------------------
--- Table `pos_db`.`transactionsearch`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `pos_db`.`transactionsearch` (
-  `TransactionID` INT NOT NULL,
-  `SearchDate` DATE NULL DEFAULT NULL,
-  `ProductID` INT NULL DEFAULT NULL,
-  `CustomerID` INT NULL DEFAULT NULL,
-  `SaleID` INT NULL DEFAULT NULL,
-  PRIMARY KEY (`TransactionID`),
-  INDEX `ProductID` (`ProductID` ASC) VISIBLE,
-  INDEX `CustomerID` (`CustomerID` ASC) VISIBLE,
-  INDEX `SaleID` (`SaleID` ASC) VISIBLE,
-  CONSTRAINT `transactionsearch_ibfk_1`
-    FOREIGN KEY (`ProductID`)
-    REFERENCES `pos_db`.`product` (`ProductID`),
-  CONSTRAINT `transactionsearch_ibfk_2`
-    FOREIGN KEY (`CustomerID`)
-    REFERENCES `pos_db`.`customer` (`CustomerID`),
-  CONSTRAINT `transactionsearch_ibfk_3`
-    FOREIGN KEY (`SaleID`)
-    REFERENCES `pos_db`.`sale` (`SaleID`))
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8mb4
-COLLATE = utf8mb4_0900_ai_ci;
-
+CREATE TABLE IF NOT EXISTS `pos_db`.`employeeauthority`
+(
+    `AuthorityID` INT NOT NULL,
+    `EmployeeID`  INT NOT NULL,
+    PRIMARY KEY (`AuthorityID`, `EmployeeID`),
+    CONSTRAINT `employeeauthority_ibfk_1`
+        FOREIGN KEY (`AuthorityID`)
+            REFERENCES `pos_db`.`authority` (`AuthorityID`),
+    CONSTRAINT `employeeauthority_ibfk_2`
+        FOREIGN KEY (`EmployeeID`)
+            REFERENCES `pos_db`.`employee` (`EmployeeID`)
+);
 
 
 
@@ -634,9 +619,9 @@ INSERT INTO membership(LevelID, CustomerID, JoinDate, ExpiryDate, Status) VALUES
 (3, 6641, 231210,241210, 'active'),
 (3, 1907, 231210,241210, 'active');
 
-INSERT INTO `pos_db`.`promotion` (`PromotionID`, `PromotionName`, `StartDate`, `EndDate`, `DiscountRate`, `PromotionDescription`) VALUES
-(1, 'BlackFriday', 20231119, 20231122, 30.0, 'BlackFriday Sale!'),
-(2, 'HappyNewYear', 20240101, 20240107, 20.0, 'Happy New Year Sale!');
+INSERT INTO `pos_db`.`promotion` (`PromotionID`, `PromotionName`, `StartDate`, `EndDate`, `PromotionDescription`) VALUES
+(1, 'BlackFriday', 20231119, 20231122, 'BlackFriday Sale!'),
+(2, 'HappyNewYear', 20240101, 20240107, 'Happy New Year Sale!');
 
 INSERT INTO category(CategoryID, CategoryName) VALUES
 (1, 'Diary'),
@@ -666,17 +651,17 @@ INSERT INTO paymentmethod(PaymentMethodID, MethodName) VALUES
 
 
 -- Inserting 10 records into the "orders" table
-INSERT INTO orders(OrderID, PaymentMethodID, CouponID, OrderDate, DiscountedTotalAmount, TotalAmount, IsRefunded) VALUES
-(1, 1, NULL, '2023-12-13', 50000, 7000.00, false),
-(2, 2, NULL, '2023-12-14', 25000, 50500.00, false),
-(3, 1, 1, '2023-12-15', 40000, 80000.00, true),
-(4, 2, NULL, '2023-12-16', 75000, 150750.00, false),
-(5, 1, NULL, '2023-12-17', 30000, 60250.00, false),
-(6, 2, NULL, '2023-12-18', 20000, 40200.00, false),
-(7, 1, 2, '2023-12-19', 45000, 90500.00, false),
-(8, 2, NULL, '2023-12-20', 60000, 120600.00, false),
-(9, 1, NULL, '2023-12-21', 35000, 70350.00, false),
-(10, 2, 3, '2023-12-22', 10000, 20100.00, true);
+INSERT INTO orders(OrderID, CustomerID, PaymentMethodID, CouponID, OrderDate, DiscountedTotalAmount, TotalAmount, IsRefunded) VALUES
+(1, 1907, 2, 1, '2023-12-1', 50000, 7000.00, false),
+(2, 1907,2, NULL, '2023-12-2', 25000, 50500.00, false),
+(3,1907, 1, 1, '2023-12-3', 40000, 80000.00, true),
+(4,1907, 2, NULL, '2023-12-4', 75000, 150750.00, false),
+(5,1907, 1, NULL, '2023-12-5', 30000, 60250.00, false),
+(6,1907, 2, NULL, '2023-12-6', 20000, 40200.00, false),
+(7,1907, 1, 2, '2023-12-7', 45000, 90500.00, false),
+(8,1907, 2, NULL, '2023-12-8', 60000, 120600.00, false),
+(9, 1907,1, NULL, '2023-12-9', 35000, 70350.00, false),
+(10, 1907, 2, 3, '2023-12-13', 10000, 14000.00, true);
 
 -- Inserting orderitem records for OrderID 1 with values based on the "product" table
 INSERT INTO orderitem(OrderItemID, OrderID, ProductID, Quantity, UnitPrice) VALUES

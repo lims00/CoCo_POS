@@ -21,7 +21,6 @@ public class OrderItemRepositoryImpl implements OrderItemRepository {
                 orderItem.getProductId(),
                 orderItem.getQuantity(),
                 orderItem.getUnitPrice());
-
         return orderItem;
     }
 }

@@ -21,7 +21,6 @@ public class PromotionRepositoryImpl implements PromotionRepository {
                     rs.getString("PromotionName"),
                     rs.getString("StartDate"),
                     rs.getString("EndDate"),
-                    rs.getInt("DiscountRate"),
                     rs.getString("PromotionDescription"));
             }, promotionId);
     };
