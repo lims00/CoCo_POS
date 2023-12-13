@@ -16,7 +16,7 @@ build/
 bin/
 !**/src/main/**/bin/
 !**/src/test/**/bin/
-
+resources/application.properties
 ### IntelliJ IDEA ###
 .idea
 *.iws
@@ -36,3 +36,4 @@ out/
 ### VS Code ###
 .vscode/
 back/cocopos/src/main/resources/application.properties
+resources/application.properties

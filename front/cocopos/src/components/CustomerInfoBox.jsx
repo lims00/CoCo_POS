@@ -1,10 +1,11 @@
-import React from "react";
+import React, {useState} from "react";
 import styled from "styled-components";
+import axios from "axios";
 
 const Title = styled.div`
   display: flex;
   height: 50px;
-  width: 110px;
+  width: 150px;
   justify-content: flex-start;
   align-items: center;
   font-size: 20px;
@@ -12,7 +13,7 @@ const Title = styled.div`
 `
 const InputBox = styled.input`
   display: flex;
-  margin-left: 30px;
+  margin-left: 10px;
   padding-left: 10px;
   margin-right: 20px;
   border: 1px solid grey;
@@ -23,7 +24,7 @@ const InputBox = styled.input`
 `
 
 const ContentBox = styled.div`
-  margin-left: 30px;
+  margin-left: 10px;
   padding-left: 10px;
   border: 1px solid grey;
   width: 300px;
@@ -35,10 +36,28 @@ const Wrapper = styled.div`
   align-items: center;
 
 `
-const CustomerInfoBox = ({title, content = "내용", inputBox = false, handleChange}) => {
-
+//@GetMapping("/coupon/{id}")
+//     public Coupon getCouponById(@PathVariable int id) {
+//         return couponRepository.getCouponById(id);
+//     }
+const CustomerInfoBox = ({title, content = "내용", inputBox = false, handleChange, totalPrice, view}) => {
+    const [coupon, setCoupon] = useState(0)//쿠폰 적용시 쿠폰 이름
     const inputHandle = (e) => {
-        handleChange(e.target.value)
+        setCoupon(e.target.value)
+
+    }
+    const handleCoupon = () => {
+        console.log('쿠폰 적용')
+        let temp = Number(totalPrice) - Number(coupon) * 1000
+        handleChange(temp)
+        axios({
+            method: "GET",
+            url: `http://localhost:8080/coupon/${coupon}`,
+        }).then((res) => {
+            console.log(res)
+        }).catch((err) => {
+            console.log(err)
+        })
     }
     return (
         <Wrapper>
@@ -51,11 +70,25 @@ const CustomerInfoBox = ({title, content = "내용", inputBox = false, handleCha
 
                 (<>
                     <InputBox onChange={inputHandle}/>
-                <button style={{ width:'80px',height:'30px',fontSize:'20px',border:'1px solid grey',background:'none',borderRadius:'10px'}}>적용</button></>
-                )
-                :
-                <ContentBox>{content}</ContentBox>
-            }
+                    {view
+                        ?
+                        <button onClick={handleCoupon}
+                                style={{
+                                    width: '80px',
+                                    height: '30px',
+                                    fontSize: '20px',
+                                    border: '1px solid grey',
+                                    background: 'none',
+                                    borderRadius: '10px'
+                                }}>적용</button>
+                        :
+                        <></>}
+                    </>
+
+                    )
+                    :
+                    <ContentBox>{content}</ContentBox>
+                    }
         </Wrapper>
     )
 }
