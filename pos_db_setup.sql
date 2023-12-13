@@ -763,30 +763,37 @@ END //
 
 DELIMITER ;
 
-
 DELIMITER //
-CREATE TRIGGER membership_expiry_trigger
+
+CREATE TRIGGER check_expiry_date
 BEFORE INSERT ON membership
 FOR EACH ROW
 BEGIN
-    IF NEW.ExpiryDate IS NOT NULL AND NEW.ExpiryDate < CURDATE() THEN
-        SET NEW.Status = 'expired';
+    IF NEW.ExpiryDate IS NOT NULL AND NEW.JoinDate IS NOT NULL AND NEW.ExpiryDate <= NEW.JoinDate THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'ExpiryDate must be greater than JoinDate';
     END IF;
 END;
 //
+
 DELIMITER ;
 
+
 DELIMITER //
-CREATE TRIGGER membership_update_trigger
-BEFORE UPDATE ON membership
+
+CREATE TRIGGER check_promotion_dates
+BEFORE INSERT ON promotion
 FOR EACH ROW
 BEGIN
-    IF NEW.ExpiryDate IS NOT NULL AND NEW.ExpiryDate < CURDATE() THEN
-        SET NEW.Status = 'expired';
+    IF NEW.EndDate IS NOT NULL AND NEW.StartDate IS NOT NULL AND NEW.EndDate <= NEW.StartDate THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'EndDate must be greater than StartDate';
     END IF;
 END;
 //
+
 DELIMITER ;
+
 
 
 -- 총 가격의 10%를 계산하는 함수
@@ -875,14 +882,14 @@ BEGIN
     -- Get the generated SaleID
     SET v_sale_id = LAST_INSERT_ID();
 
-    -- Inserting into `saleitem` table
+    — Inserting into `saleitem` table
     INSERT INTO saleitem (SaleID, ProductID, Quantity, UnitPrice)
     SELECT v_sale_id, oi.ProductID, oi.Quantity, oi.UnitPrice
     FROM orderitem oi
     WHERE oi.OrderID = p_order_id;
 
-    -- Remove the processed orderitem (You can keep the order by commenting or removing this line)
-    -- DELETE FROM orderitem WHERE OrderID = p_order_id;
+    — Remove the processed orderitem (You can keep the order by commenting or removing this line)
+    — DELETE FROM orderitem WHERE OrderID = p_order_id;
 
     SELECT 'Transaction completed successfully' AS Message;
 END //
