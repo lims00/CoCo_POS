@@ -2,6 +2,7 @@ package com.team6.dao;
 
 import com.team6.entity.Product;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Repository;
 import org.springframework.jdbc.core.JdbcTemplate;
 
@@ -54,18 +55,28 @@ public class ProductRepositoryImpl implements ProductRepository {
 
     @Override
     public Product getById(int ProductID) {
-        return jdbcTemplate.queryForObject(GET_PRODUCT_BY_ID_QUERY, (rs, rowNum) -> {
-            return new Product(
-                    rs.getInt("ProductID"),
-                    rs.getString("ProductName"),
-                    rs.getInt("Price"),
-                    rs.getInt("StockQuantity"),
-                    rs.getInt("CategoryID"));
-        }, ProductID);
+        try {
+            List<Product> products = jdbcTemplate.query(GET_PRODUCT_BY_ID_QUERY, (rs, rowNum) -> {
+                return new Product(
+                        rs.getInt("ProductID"),
+                        rs.getString("ProductName"),
+                        rs.getInt("Price"),
+                        rs.getInt("StockQuantity"),
+                        rs.getInt("CategoryID"));
+            }, ProductID);
+
+            if (products.isEmpty()) {
+                // 해당 ID에 대한 제품이 없는 경우 예외 처리 또는 특정 값 반환 등을 수행
+                return null; // 예시로 null 반환
+            }
+
+            return products.get(0); // 결과가 있을 경우 첫 번째 제품 반환
+        } catch (EmptyResultDataAccessException ex) {
+            // 예외 처리를 강화하여 더 의미 있는 오류 메시지를 제공하세요
+            System.err.println("No product found for ID: " + ProductID);
+            return null;
+        }
     }
-
-    ;
-
     @Override
     public String deleteById(int productId) {
         jdbcTemplate.update(DELETE_PRODUCT_BY_ID, productId);

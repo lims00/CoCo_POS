@@ -19,7 +19,7 @@ public class CartRepositoryImpl implements CartRepository{
             "SELECT * FROM cart WHERE CustomerID=?";
 
     private static final String UPDATE_TOTAL_PRICE_QUERY =
-            "UPDATE cart SET(TotalPrice = ?) WHERE CartID=?";
+            "UPDATE cart SET TotalPrice = ? WHERE CartID=?";
 
     @Override
     public boolean createCart(int customerId) {
